@@ -3,6 +3,37 @@
 
 void MainMenu();
 void SwitchScreen(int);
+// void Move(int, int);
+
+// //Function to move the car
+// void Move(int touchx, int touchy){
+//     int rectX=175, rectY=170, rectW=105, rectH=30, lineX=227;
+//     bool gamePlay = true;
+
+//     LCD.SetFontColor(WHITE);
+//     LCD.DrawRectangle(rectX, rectY, rectW, rectH);
+//     LCD.DrawLine(lineX, 170, lineX, 199);
+//     LCD.WriteAt("<--", 178, 175);
+//     LCD.WriteAt("-->", 238, 175);
+//     LCD.Update();
+
+//     while (gamePlay){
+//             // while(!LCD.Touch(&touchx, &touchy)){}
+//             // while(LCD.Touch(&touchx, &touchy)){}
+
+//             if (touchx < rectX+(rectW/2) && touchx > rectX && touchy > rectY && touchy < rectY+rectH)
+//             {
+//                 //Move car left
+//                 LCD.WriteAt("left", touchx, touchy);
+                
+//             } else if (touchx < rectX+rectW && touchx > rectX+(rectW/2) && touchy > rectY && touchy < rectY+rectH){
+//                 //Move car right
+//                 LCD.WriteAt("right", touchx, touchy);
+
+//             }
+//     }
+
+// }
 
 //Function to switch the screen.
 void SwitchScreen(int screen)
@@ -18,14 +49,19 @@ void SwitchScreen(int screen)
         LCD.SetBackgroundColor(BLACK);
         LCD.Clear();
 
-        //Gameplay
-        LCD.WriteAt("Play game here", 90, 80);
-        LCD.Update();
-
         // Draw Main Menu button
         LCD.SetFontColor(RED);
         LCD.DrawRectangle(x1, y1, width, height);
         LCD.WriteAt("Main Menu", x1+5, y1+5);
+        LCD.Update();
+
+        //Draw arrow buttons
+        int rectX=175, rectY=170, rectW=105, rectH=30, lineX=227;
+        LCD.SetFontColor(WHITE);
+        LCD.DrawRectangle(rectX, rectY, rectW, rectH);
+        LCD.DrawLine(lineX, 170, lineX, 199);
+        LCD.WriteAt("<--", 178, 175);
+        LCD.WriteAt("-->", 238, 175);
         LCD.Update();
 
         //Check if player clicks main menu button
@@ -39,8 +75,16 @@ void SwitchScreen(int screen)
             {
                 MainMenu();
                 keepTrackingClicks = false;
+            } else if (touchx < rectX+(rectW/2) && touchx > rectX && touchy > rectY && touchy < rectY+rectH){
+                //Move car left
+                LCD.WriteAt("left", touchx, touchy);
+                
+            } else if (touchx < rectX+rectW && touchx > rectX+(rectW/2) && touchy > rectY && touchy < rectY+rectH){
+                //Move car right
+                LCD.WriteAt("right", touchx, touchy);
             }
         }
+
 
     } else if (screen ==2)
     {
