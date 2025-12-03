@@ -112,7 +112,7 @@ void StartGame(int level)
         LCD.Update();
 
         //Draw road lines
-        LCD.DrawLine(160, 0, 160, 240);
+        //LCD.DrawLine(160, 0, 160, 240);
         LCD.DrawLine(20, 0, 20, 240);
         LCD.DrawLine(140, 0, 140, 240);
         LCD.DrawLine(60, 0, 60, 240);
@@ -566,9 +566,9 @@ void question::random()
             addSub = '+';
             //Write question
             LCD.SetFontScale(1);
-            LCD.WriteAt(num1, 120, 15);
-            LCD.WriteAt(addSub, 150, 15);
-            LCD.WriteAt(num2, 170, 15);
+            LCD.WriteAt(num1, 190, 90);
+            LCD.WriteAt(addSub, 220, 90);
+            LCD.WriteAt(num2, 240, 90);
 
         } else
         {
@@ -579,9 +579,9 @@ void question::random()
             answer = num1 - num2;
             //Write question
             LCD.SetFontScale(1);
-            LCD.WriteAt(num1, 120, 15);
-            LCD.WriteAt(addSub, 150, 15);
-            LCD.WriteAt(num2, 170, 15);
+            LCD.WriteAt(num1, 190, 90);
+            LCD.WriteAt(addSub, 220, 90);
+            LCD.WriteAt(num2, 240, 90);
 
             } else
             {
@@ -589,14 +589,16 @@ void question::random()
                 answer = num2 - num1;
                 //Write question
                 LCD.SetFontScale(1);
-                LCD.WriteAt(num2, 120, 15);
-                LCD.WriteAt(addSub, 150, 15);
-                LCD.WriteAt(num1, 170, 15);
+                LCD.WriteAt(num2, 190, 90);
+                LCD.WriteAt(addSub, 220, 90);
+                LCD.WriteAt(num1, 240, 90);
 
             }
         }
 
         //Pick random 1-3 gate that the answer falls through.
+        LCD.SetFontScale(0.8);
+        int rectW = 40, rectY = 0;
         while (decoy2 == 0)
         {
             randomNumber = Random.RandInt()/200;
@@ -604,80 +606,71 @@ void question::random()
             if (randomNumber > 10 && randomNumber < 15)
             {
                 //Draw true answer in first box.
-                LCD.DrawRectangle(50, 40, 50, 30);
-                LCD.WriteAt(answer, 50+5, 40+5);
+                LCD.DrawRectangle(20, rectY, rectW, 30);
+                LCD.WriteAt(answer, 20+5, rectY+5);
                 ansLocation=50; //Store answer location
-
 
                 //Draw decoy answer
                 decoy1 = (a + b + randomNumber) * 4.0/5.0 ;
-                LCD.DrawRectangle(130, 40, 50, 30);
-                LCD.WriteAt(decoy1, 130+5, 40+5);
+                LCD.DrawRectangle(60, rectY, rectW, 30);
+                LCD.WriteAt(decoy1, 60+5, rectY+5);
 
                 //Draw decoy answer
                 decoy2 = answer - randomNumber;
-                if (decoy2 > 0)
+                if (decoy2 <= 0)
                 {
-                    LCD.DrawRectangle(210, 40, 50, 30);
-                    LCD.WriteAt(decoy2, 210+5, 40+5);
-                } else
-                {
-                    decoy2 = answer + randomNumber + 5;
-                    LCD.DrawRectangle(210, 40, 50, 30);
-                    LCD.WriteAt(decoy2, 210+5, 40+5);
-                }
+                   decoy2 = answer + randomNumber + 5;
+                } 
+
+                LCD.DrawRectangle(100, rectY, rectW, 30);
+                LCD.WriteAt(decoy2, 100+5, rectY+5);
+                LCD.Update();
 
             } else if (randomNumber > 15 && randomNumber < 20)
             {
                 //Draw true answer in second box.
-                LCD.DrawRectangle(130, 40, 50, 30);
-                LCD.WriteAt(answer, 130+5, 40+5);
+                LCD.DrawRectangle(60, rectY, rectW, 30);
+                LCD.WriteAt(answer, 60+5, rectY+5);
                 ansLocation=130; //Store answer location
-
 
                 //Draw decoy answer
                 decoy1 = (a + b + randomNumber) * 4.0/5.0 ;
-                LCD.DrawRectangle(50, 40, 50, 30);
-                LCD.WriteAt(decoy1, 50+5, 40+5);
+                LCD.DrawRectangle(20, rectY, rectW, 30);
+                LCD.WriteAt(decoy1, 20+5, rectY+5);
 
                 //Draw decoy answer
                 decoy2 = answer - randomNumber;
-                if (decoy2 > 0)
+                if (decoy2 <= 0)
                 {
-                    LCD.DrawRectangle(210, 40, 50, 30);
-                    LCD.WriteAt(decoy2, 210+5, 40+5);
-                } else
-                {
-                    decoy2 = answer + randomNumber + 5;
-                    LCD.DrawRectangle(210, 40, 50, 30);
-                    LCD.WriteAt(decoy2, 210+5, 40+5);
-                }
+                   decoy2 = answer + randomNumber + 5;
+                } 
+
+                LCD.DrawRectangle(100, rectY, rectW, 30);
+                LCD.WriteAt(decoy2, 100+5, rectY+5);
+                LCD.Update();
 
             } else if (randomNumber > 20 && randomNumber < 25)
             {
                 //Draw true answer in third box.
-                LCD.DrawRectangle(210, 40, 50, 30);
-                LCD.WriteAt(answer, 210+5, 40+5);
+                LCD.DrawRectangle(100, rectY, 40, 30);
+                LCD.WriteAt(answer, 100+5, rectY+5);
                 ansLocation=210; //Store answer location
-
 
                 //Draw decoy answer
                 decoy1 = (a + b + randomNumber) * 6.0/7.0 ;
-                LCD.DrawRectangle(130, 40, 50, 30);
-                LCD.WriteAt(decoy1, 130+5, 40+5);
+                LCD.DrawRectangle(60, rectY, 40, 30);
+                LCD.WriteAt(decoy1, 60+5, rectY+5);
 
                 //Draw decoy answer
                 decoy2 = answer - randomNumber;
-                if (decoy2 > 0)
+                if (decoy2 <= 0)
                 {
-                    LCD.DrawRectangle(50, 40, 50, 30);
-                    LCD.WriteAt(decoy2, 50+5, 40+5);
-                } else
-                {
-                    decoy2 = answer + randomNumber + 5;
-                    LCD.DrawRectangle(50, 40, 50, 30);
-                    LCD.WriteAt(decoy2, 50+5, 40+5);
-                }
+                   decoy2 = answer + randomNumber + 5;
+                } 
+
+                LCD.DrawRectangle(20, rectY, rectW, 30);
+                LCD.WriteAt(decoy2, 20+5, rectY+5);
+                LCD.Update();
 
             }
 
