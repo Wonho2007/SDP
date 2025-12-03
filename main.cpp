@@ -1,4 +1,5 @@
 //320 x 240
+//lane1x=30, lane2x=70, lane3x=110
 #include "FEHLCD.h"
 #include "FEHUtility.h"
 #include "FEHRandom.h"
@@ -31,8 +32,8 @@ void MoveLeft(int *xptr){
 
     if (carx>=70){
         LCD.SetFontColor(BLACK);
-        LCD.DrawRectangle(carx, cary, 25, 45); // Draw over old car
-        LCD.DrawRectangle(170, 205, 100, 50);
+        LCD.FillRectangle(carx, cary, 25, 45); // Draw over old car
+        LCD.FillRectangle(170, 202, 115, 38);
         LCD.Update();
         carx-=40;
         *xptr-=40;
@@ -40,7 +41,9 @@ void MoveLeft(int *xptr){
         LCD.Update();
     } else {
         LCD.SetFontColor(WHITE);
-        LCD.WriteAt("Already in left lane!", 175, 210);
+        LCD.SetFontScale(0.75);
+        LCD.WriteAt("Already in", 180, 202);
+        LCD.WriteAt("left lane!", 180, 217);
     }
 
 }
@@ -48,12 +51,12 @@ void MoveLeft(int *xptr){
 //Function to move car right
 void MoveRight(int *xptr){
     int carx=*xptr, cary=160;
-    //lane1x=30, lane2x=70, lane3x=110
     FEHImage car("car.png");
+
     if (carx<=70){
         LCD.SetFontColor(BLACK);
-        LCD.DrawRectangle(carx, cary, 25, 45); // Draw over old car
-        LCD.DrawRectangle(170, 205, 100, 50);
+        LCD.FillRectangle(carx, cary, 25, 45); // Draw over old car
+        LCD.FillRectangle(170, 202, 115, 38);
         LCD.Update();
         carx+=40;
         *xptr+=40;
@@ -61,7 +64,9 @@ void MoveRight(int *xptr){
         LCD.Update();
     } else {
         LCD.SetFontColor(WHITE);
-        LCD.WriteAt("Already in right lane!", 175, 210);
+        LCD.SetFontScale(0.75);
+        LCD.WriteAt("Already in", 180, 202);
+        LCD.WriteAt("right lane!", 179, 217);
     }
 }
 
@@ -155,8 +160,6 @@ void StartGame(int level)
         LCD.WriteAt("<--", 178, 175);
         LCD.WriteAt("-->", 238, 175);
         LCD.Update();
-
-
 
 
         question levelTwo(2);
@@ -506,7 +509,6 @@ int main() {
     return 0;
 }
 
-
 question::question(int l, int a, int b, int x, int y)
 {
 
@@ -528,7 +530,7 @@ void question::random()
     char addSub;
     num1 = 0;
     num2 = 0;
-
+    int ansLocation;
 
     if (level == 1)
     {
@@ -604,6 +606,7 @@ void question::random()
                 //Draw true answer in first box.
                 LCD.DrawRectangle(50, 40, 50, 30);
                 LCD.WriteAt(answer, 50+5, 40+5);
+                ansLocation=50; //Store answer location
 
 
                 //Draw decoy answer
@@ -629,6 +632,7 @@ void question::random()
                 //Draw true answer in second box.
                 LCD.DrawRectangle(130, 40, 50, 30);
                 LCD.WriteAt(answer, 130+5, 40+5);
+                ansLocation=130; //Store answer location
 
 
                 //Draw decoy answer
@@ -654,6 +658,7 @@ void question::random()
                 //Draw true answer in third box.
                 LCD.DrawRectangle(210, 40, 50, 30);
                 LCD.WriteAt(answer, 210+5, 40+5);
+                ansLocation=210; //Store answer location
 
 
                 //Draw decoy answer
@@ -687,7 +692,7 @@ void question::random()
     } else if (level == 2)
     {
 
-        //Pick 2 random integers between 2 and 12
+        //Pick 2 random integers less than 100
         while (num1 == 0)
         {
             a = Random.RandInt()/200;
@@ -713,6 +718,7 @@ void question::random()
         //Pick random division, print question
         answer = num1 * num2;
 
+        addSub = '+';
         //Write question
         LCD.SetFontScale(1);
         LCD.WriteAt(num1, 120, 15);
