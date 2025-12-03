@@ -7,8 +7,8 @@
 void MainMenu();
 void StartGame(int);
 void SwitchScreen(int);
-void MoveLeft();
-void MoveRight();
+void MoveLeft(int *);
+void MoveRight(int *);
 
 class question
 {
@@ -25,23 +25,44 @@ public:
 };
 
 //Function to move car left
-void MoveLeft(){
-    int carx, lane1x=30, lane2x=70, lane3x=110, cary=160;
-    LCD.DrawRectangle(lane1x, cary, 20, 40); //Car position lane 1
-    LCD.DrawRectangle(lane2x, cary, 20, 40); //Car position lane 2
-    LCD.DrawRectangle(lane3x, cary, 20, 40); //Car position lane 3
+void MoveLeft(int *xptr){
+    int carx=*xptr, lane1x=30, lane2x=70, lane3x=110, cary=160;
+    FEHImage car("car.png");
 
+    if (carx>=70){
+        LCD.SetFontColor(BLACK);
+        LCD.DrawRectangle(carx, cary, 25, 45); // Draw over old car
+        LCD.DrawRectangle(170, 205, 100, 50);
+        LCD.Update();
+        carx-=40;
+        *xptr-=40;
+        car.Draw(carx, cary);
+        LCD.Update();
+    } else {
+        LCD.SetFontColor(WHITE);
+        LCD.WriteAt("Already in left lane!", 175, 210);
+    }
 
 }
 
 //Function to move car right
-void MoveRight(){
-    int lane1x=30, lane2x=70, lane3x=110, cary=160;
-    LCD.DrawRectangle(lane1x, cary, 20, 40); //Car position lane 1
-    LCD.DrawRectangle(lane2x, cary, 20, 40); //Car position lane 2
-    LCD.DrawRectangle(lane3x, cary, 20, 40); //Car position lane 3
-
-
+void MoveRight(int *xptr){
+    int carx=*xptr, cary=160;
+    //lane1x=30, lane2x=70, lane3x=110
+    FEHImage car("car.png");
+    if (carx<=70){
+        LCD.SetFontColor(BLACK);
+        LCD.DrawRectangle(carx, cary, 25, 45); // Draw over old car
+        LCD.DrawRectangle(170, 205, 100, 50);
+        LCD.Update();
+        carx+=40;
+        *xptr+=40;
+        car.Draw(carx, cary);
+        LCD.Update();
+    } else {
+        LCD.SetFontColor(WHITE);
+        LCD.WriteAt("Already in right lane!", 175, 210);
+    }
 }
 
 
@@ -78,9 +99,11 @@ void StartGame(int level)
         question levelOne(1);
         //Generate a random question
         levelOne.random();
+        
         //Import car image and draw
         FEHImage car("car.png");
-        car.Draw(50, 120);
+        int carx=70, cary=160, *xptr=&carx;
+        car.Draw(carx, cary);
         LCD.Update();
 
         //Draw road lines
@@ -103,10 +126,10 @@ void StartGame(int level)
                 keepTrackingClicks = false;
             } else if (touchx < rectX+(rectW/2) && touchx > rectX && touchy > rectY && touchy < rectY+rectH){
                 //Move car left
-                MoveLeft();
+                MoveLeft(xptr);
             } else if (touchx < rectX+rectW && touchx > rectX+(rectW/2) && touchy > rectY && touchy < rectY+rectH){
                 //Move car right
-                MoveRight();
+                MoveRight(xptr);
             }
         }
     } else if (level == 2)
