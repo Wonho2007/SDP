@@ -1,3 +1,4 @@
+//320 x 240
 #include "FEHLCD.h"
 #include "FEHUtility.h"
 #include "FEHRandom.h"
@@ -6,7 +7,8 @@
 void MainMenu();
 void StartGame(int);
 void SwitchScreen(int);
-
+void MoveLeft();
+void MoveRight();
 
 class question
 {
@@ -22,6 +24,26 @@ public:
     void random();
 };
 
+//Function to move car left
+void MoveLeft(){
+    int carx, lane1x=30, lane2x=70, lane3x=110, cary=160;
+    LCD.DrawRectangle(lane1x, cary, 20, 40); //Car position lane 1
+    LCD.DrawRectangle(lane2x, cary, 20, 40); //Car position lane 2
+    LCD.DrawRectangle(lane3x, cary, 20, 40); //Car position lane 3
+
+
+}
+
+//Function to move car right
+void MoveRight(){
+    int lane1x=30, lane2x=70, lane3x=110, cary=160;
+    LCD.DrawRectangle(lane1x, cary, 20, 40); //Car position lane 1
+    LCD.DrawRectangle(lane2x, cary, 20, 40); //Car position lane 2
+    LCD.DrawRectangle(lane3x, cary, 20, 40); //Car position lane 3
+
+
+}
+
 
 //Function to start game
 void StartGame(int level)
@@ -32,7 +54,6 @@ void StartGame(int level)
 
     if (level == 1)
     {
-
         int questionsAnswered = 0;
         int x1 = 170, y1 = 20, width = 120, height = 30;
         int touchx, touchy;
@@ -54,9 +75,6 @@ void StartGame(int level)
         LCD.WriteAt("-->", 238, 175);
         LCD.Update();
 
-
-
-
         question levelOne(1);
         //Generate a random question
         levelOne.random();
@@ -64,6 +82,13 @@ void StartGame(int level)
         FEHImage car("car.png");
         car.Draw(50, 120);
         LCD.Update();
+
+        //Draw road lines
+        LCD.DrawLine(160, 0, 160, 240);
+        LCD.DrawLine(20, 0, 20, 240);
+        LCD.DrawLine(140, 0, 140, 240);
+        LCD.DrawLine(60, 0, 60, 240);
+        LCD.DrawLine(100, 0, 100, 240);
 
 
         while (keepTrackingClicks)
@@ -78,17 +103,12 @@ void StartGame(int level)
                 keepTrackingClicks = false;
             } else if (touchx < rectX+(rectW/2) && touchx > rectX && touchy > rectY && touchy < rectY+rectH){
                 //Move car left
-                LCD.WriteAt("left", touchx, touchy);
-                
+                MoveLeft();
             } else if (touchx < rectX+rectW && touchx > rectX+(rectW/2) && touchy > rectY && touchy < rectY+rectH){
                 //Move car right
-                LCD.WriteAt("right", touchx, touchy);
+                MoveRight();
             }
         }
-
-
-
-
     } else if (level == 2)
     {
 
@@ -172,7 +192,6 @@ void SwitchScreen(int screen)
         LCD.WriteAt("Main Menu", x1+5, y1+5);
         LCD.Update();
 
-        
 
         // Draw Difficulty buttons
         int levelButtonx = 110, levelButtony = 60, levelButtonWidth = 100, levelButtonHeight = 30;
