@@ -16,14 +16,21 @@ class question
 {
 public:
     int level;
-    int num1;
-    int num2;
+    int decoy1;
+    int decoy2;
     int response;
     int answer;
+    int correctX;
+
+    int decoy1X;
+    int decoy2X;
+
+    int answerY;
 
 
-    question(int = 1, int = 0, int = 0, int = 0, int = 0);
+    question(int = 1, int = 0, int = 0, int = 0, int = 0, int = 0, int = 0, int = 0, int=0);
     void random();
+    int moveAnswers(int *);
 };
 
 //Function to move car left
@@ -155,8 +162,19 @@ void StartGame(int level)
 
         while (keepTrackingClicks)
         {
-            while(!LCD.Touch(&touchx, &touchy)){}
-            while(LCD.Touch(&touchx, &touchy)){}
+            while(!LCD.Touch(&touchx, &touchy))
+            {
+                //Move options down
+                if (levelOne.moveAnswers(xptr)==2){
+                    questionsAnswered++;
+                }
+                
+            }
+
+            while(LCD.Touch(&touchx, &touchy))
+            {
+                
+            }
 
 
             if (touchx < x1+width && touchx > x1 && touchy > y1 && touchy < y1+height)
@@ -546,28 +564,86 @@ int main() {
     return 0;
 }
 
-question::question(int l, int a, int b, int x, int y)
+question::question(int l, int a, int b, int x, int y, int z, int c, int d, int e)
 {
 
     level = l;
-    num1 = a;
-    num2 = b;
+    decoy1 = a;
+    decoy2 = b;
     response = x;
     answer = y;
+    correctX = z;
 
+    decoy1X = c;
+    decoy2X = d;
+
+    answerY = e;
+}
+
+//Function to move the answer options and check if player won
+int question::moveAnswers(int *xptr)
+{
+
+    //See if the car is at the correct x position and y
+    if (*xptr == correctX+10 && answerY >= 160-30)
+    {
+        //You win
+        
+        LCD.Write("You Win");
+        
+        return(2);
+
+
+    }else if (answerY < 160-30 )
+    {
+        //Draw over old answers
+        int x1=20, x2=60, x3=100, rectH=30, rectW=40;
+    
+        LCD.SetFontColor(BLACK);
+        LCD.FillRectangle(x1, answerY, rectW, rectH);
+        LCD.FillRectangle(x2, answerY, rectW, rectH);
+        LCD.FillRectangle(x3, answerY, rectW, rectH);
+
+        LCD.SetFontColor(WHITE);
+        LCD.DrawLine(160, 0, 160, 240);
+        LCD.DrawLine(20, 0, 20, 240);
+        LCD.DrawLine(1, 0, 1, 240);
+        LCD.DrawLine(140, 0, 140, 240);
+        LCD.DrawLine(60, 0, 60, 240);
+        LCD.DrawLine(100, 0, 100, 240);
+        LCD.Update();
+       
+        answerY+=1;
+
+        //Redraw rectanlges and answers
+        LCD.DrawRectangle(correctX, answerY, rectW, rectH);
+        LCD.WriteAt(answer, correctX+5, answerY+5);
+        LCD.DrawRectangle(decoy1X, answerY, rectW, rectH);
+        LCD.WriteAt(decoy1, decoy1X+5, answerY+5);
+        LCD.DrawRectangle(decoy2X, answerY, rectW, rectH);
+        LCD.WriteAt(decoy2, decoy2X+5, answerY+5);
+        LCD.Update();
+    
+        //Draw new answers
+
+        return(1);
+
+    }else
+    {
+        //Lose
+        LCD.Write("You Lose");
+        return(0);
+    }
 }
 
 void question::random()
 {
     int a;
     int b;
-    int decoy1 = 0;
-    int decoy2 = 0;
     int randomNumber;
     char addSub;
-    num1 = 0;
-    num2 = 0;
-    int ansLocation, decoy1Location, decoy2Location;
+    int num1 = 0;
+    int num2 = 0;
 
     if (level == 1)
     {
@@ -643,15 +719,16 @@ void question::random()
             if (randomNumber > 10 && randomNumber < 15)
             {
                 //Draw true answer in first box.
-                LCD.DrawRectangle(20, rectY, rectW, 30);
-                LCD.WriteAt(answer, 20+5, rectY+5);
-                ansLocation=20; //Store answer location
+                correctX = 20;
+                LCD.DrawRectangle(correctX, rectY, rectW, 30);
+                LCD.WriteAt(answer, correctX+5, rectY+5);
+                
 
                 //Draw decoy answer
+                decoy1X = 60;
                 decoy1 = (a + b + randomNumber) * 4.0/5.0 ;
-                LCD.DrawRectangle(60, rectY, rectW, 30);
-                LCD.WriteAt(decoy1, 60+5, rectY+5);
-                decoy1Location=60;
+                LCD.DrawRectangle(decoy1X, rectY, rectW, 30);
+                LCD.WriteAt(decoy1, decoy1X+5, rectY+5);
 
                 //Draw decoy answer
                 decoy2 = answer - randomNumber;
@@ -660,26 +737,28 @@ void question::random()
                    decoy2 = answer + randomNumber + 5;
                 } 
 
-                LCD.DrawRectangle(100, rectY, rectW, 30);
-                LCD.WriteAt(decoy2, 100+5, rectY+5);
+                decoy2X = 100;
+                LCD.DrawRectangle(decoy2X, rectY, rectW, 30);
+                LCD.WriteAt(decoy2, decoy2X+5, rectY+5);
                 LCD.Update();
-                decoy2Location=100;
+                // decoy2Location=100;
 
                 //Animate squares
-                Animate(answer, decoy1, decoy2, rectY, ansLocation, decoy1Location, decoy2Location);
+                // Animate(answer, decoy1, decoy2, rectY, ansLocation, decoy1Location, decoy2Location);
 
             } else if (randomNumber > 15 && randomNumber < 20)
             {
                 //Draw true answer in second box.
-                LCD.DrawRectangle(60, rectY, rectW, 30);
-                LCD.WriteAt(answer, 60+5, rectY+5);
-                ansLocation=60; //Store answer location
+                correctX=60; //Store answer location
+                LCD.DrawRectangle(correctX, rectY, rectW, 30);
+                LCD.WriteAt(answer, correctX+5, rectY+5);
+                
 
                 //Draw decoy answer
+                decoy1X = 20;
                 decoy1 = (a + b + randomNumber) * 4.0/5.0 ;
-                LCD.DrawRectangle(20, rectY, rectW, 30);
-                LCD.WriteAt(decoy1, 20+5, rectY+5);
-                decoy1Location=20;
+                LCD.DrawRectangle(decoy1X, rectY, rectW, 30);
+                LCD.WriteAt(decoy1, decoy1X+5, rectY+5);
 
                 //Draw decoy answer
                 decoy2 = answer - randomNumber;
@@ -688,26 +767,28 @@ void question::random()
                    decoy2 = answer + randomNumber + 5;
                 } 
 
-                LCD.DrawRectangle(100, rectY, rectW, 30);
-                LCD.WriteAt(decoy2, 100+5, rectY+5);
+                decoy2X = 100;
+                LCD.DrawRectangle(decoy2X, rectY, rectW, 30);
+                LCD.WriteAt(decoy2, decoy2X+5, rectY+5);
                 LCD.Update();
-                decoy2Location=100;
+                // decoy2Location=100;
 
                 //Animate squares
-                Animate(answer, decoy1, decoy2, rectY, ansLocation, decoy1Location, decoy2Location);
+                // Animate(answer, decoy1, decoy2, rectY, ansLocation, decoy1Location, decoy2Location);
 
             } else if (randomNumber > 20 && randomNumber < 25)
             {
                 //Draw true answer in third box.
-                LCD.DrawRectangle(100, rectY, 40, 30);
-                LCD.WriteAt(answer, 100+5, rectY+5);
-                ansLocation=100; //Store answer location
+                correctX=100; //Store answer location
+                LCD.DrawRectangle(correctX, rectY, 40, 30);
+                LCD.WriteAt(answer, correctX+5, rectY+5);
+                
 
                 //Draw decoy answer
+                decoy1X = 60;
                 decoy1 = (a + b + randomNumber) * 6.0/7.0 ;
-                LCD.DrawRectangle(60, rectY, 40, 30);
-                LCD.WriteAt(decoy1, 60+5, rectY+5);
-                decoy1Location=60;
+                LCD.DrawRectangle(decoy1X, rectY, 40, 30);
+                LCD.WriteAt(decoy1, decoy1X+5, rectY+5);
 
                 //Draw decoy answer
                 decoy2 = answer - randomNumber;
@@ -716,13 +797,14 @@ void question::random()
                    decoy2 = answer + randomNumber + 5;
                 } 
 
-                LCD.DrawRectangle(20, rectY, rectW, 30);
-                LCD.WriteAt(decoy2, 20+5, rectY+5);
+                decoy2X = 20;
+                LCD.DrawRectangle(decoy2X, rectY, rectW, 30);
+                LCD.WriteAt(decoy2, decoy2X+5, rectY+5);
                 LCD.Update();
-                decoy2Location=20;
+                // decoy2Location=20;
 
                 //Animate squares
-                Animate(answer, decoy1, decoy2, rectY, ansLocation, decoy1Location, decoy2Location);
+                // Animate(answer, decoy1, decoy2, rectY, ansLocation, decoy1Location, decoy2Location);
 
             }
 
