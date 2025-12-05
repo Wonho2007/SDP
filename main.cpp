@@ -10,7 +10,7 @@ void StartGame(int);
 void SwitchScreen(int);
 void MoveLeft(int *);
 void MoveRight(int *);
-void Animate(int, int, int, int, int, int, int);
+void endScreen();
 
 class question
 {
@@ -32,6 +32,16 @@ public:
     void random();
     int moveAnswers(int *);
 };
+
+//Function to make endscreen
+void endScreen(){
+    LCD.SetBackgroundColor(BLACK);
+    LCD.SetFontScale(1.5);
+    LCD.Clear();
+    LCD.WriteAt("YOU CRASHED!", 100, 200);
+    Sleep(5.0);
+    MainMenu();
+}
 
 //Function to move car left
 void MoveLeft(int *xptr){
@@ -76,39 +86,6 @@ void MoveRight(int *xptr){
         LCD.WriteAt("Already in", 180, 202);
         LCD.WriteAt("right lane!", 179, 217);
     }
-}
-
-//Function to animate answers
-void Animate(int answer, int decoy1, int decoy2, int rectY, int ansL, int d1L, int d2L){
-    int x1=20, x2=60, x3=100, rectH=30, rectW=40;
-    while (rectY<135){
-        LCD.SetFontColor(BLACK);
-        LCD.FillRectangle(x1, rectY, rectW, rectH);
-        LCD.FillRectangle(x2, rectY, rectW, rectH);
-        LCD.FillRectangle(x3, rectY, rectW, rectH);
-
-        LCD.SetFontColor(WHITE);
-        LCD.DrawLine(160, 0, 160, 240);
-        LCD.DrawLine(20, 0, 20, 240);
-        LCD.DrawLine(1, 0, 1, 240);
-        LCD.DrawLine(140, 0, 140, 240);
-        LCD.DrawLine(60, 0, 60, 240);
-        LCD.DrawLine(100, 0, 100, 240);
-        LCD.Update();
-        
-        rectY+=1;
-
-        //Redraw rectanlges and answers
-        LCD.DrawRectangle(ansL, rectY, rectW, rectH);
-        LCD.WriteAt(answer, ansL+5, rectY+5);
-        LCD.DrawRectangle(d1L, rectY, rectW, rectH);
-        LCD.WriteAt(decoy1, d1L+5, rectY+5);
-        LCD.DrawRectangle(d2L, rectY, rectW, rectH);
-        LCD.WriteAt(decoy2, d2L+5, rectY+5);
-        LCD.Update();
-    }
-
-
 }
 
 
@@ -162,42 +139,43 @@ void StartGame(int level)
 
         while (keepTrackingClicks)
         {
-            while(!LCD.Touch(&touchx, &touchy))
-            {
-                //Move options down
-                int gameState = levelOne.moveAnswers(xptr);
-
-                if (gameState == 2)
+            int gameState=levelOne.moveAnswers(xptr);
+            while(gameState==2){
+                while(!LCD.Touch(&touchx, &touchy))
                 {
-                    questionsAnswered++;
+                    //Move options down
+                    gameState=levelOne.moveAnswers(xptr);
+                    if (gameState==2){
+                        questionsAnswered++;
+                    } else if (gameState==0){
+                        endScreen();
+                    }
 
-                } else if (gameState == 0)
+                    
+                }
+
+                while(LCD.Touch(&touchx, &touchy))
+                {
+                    
+                }
+
+
+                if (touchx < x1+width && touchx > x1 && touchy > y1 && touchy < y1+height)
                 {
                     MainMenu();
+                    keepTrackingClicks = false;
+                } else if (touchx < rectX+(rectW/2) && touchx > rectX && touchy > rectY && touchy < rectY+rectH){
+                    //Move car left
+                    MoveLeft(xptr);
+                    
+
+
+                } else if (touchx < rectX+rectW && touchx > rectX+(rectW/2) && touchy > rectY && touchy < rectY+rectH){
+                    //Move car right
+                    MoveRight(xptr);
                 }
-                
             }
-
-            while(LCD.Touch(&touchx, &touchy))
-            {
-                
-            }
-
-
-            if (touchx < x1+width && touchx > x1 && touchy > y1 && touchy < y1+height)
-            {
-                MainMenu();
-                keepTrackingClicks = false;
-            } else if (touchx < rectX+(rectW/2) && touchx > rectX && touchy > rectY && touchy < rectY+rectH){
-                //Move car left
-                MoveLeft(xptr);
-                
-
-
-            } else if (touchx < rectX+rectW && touchx > rectX+(rectW/2) && touchy > rectY && touchy < rectY+rectH){
-                //Move car right
-                MoveRight(xptr);
-            }
+            
         }
     } else if (level == 2)
     {
