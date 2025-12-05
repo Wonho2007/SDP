@@ -165,8 +165,15 @@ void StartGame(int level)
             while(!LCD.Touch(&touchx, &touchy))
             {
                 //Move options down
-                if (levelOne.moveAnswers(xptr)==2){
+                int gameState = levelOne.moveAnswers(xptr);
+
+                if (gameState == 2)
+                {
                     questionsAnswered++;
+
+                } else if (gameState == 0)
+                {
+                    MainMenu();
                 }
                 
             }
