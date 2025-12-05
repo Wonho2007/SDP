@@ -5,12 +5,13 @@
 #include "FEHRandom.h"
 #include "FEHImages.h"
 
-void MainMenu();
-void StartGame(int);
-void SwitchScreen(int);
+void MainMenu(int *);
+void StartGame(int, int *, int *);
+void SwitchScreen(int, int *);
 void MoveLeft(int *);
 void MoveRight(int *);
-void Animate(int, int, int, int, int, int, int);
+void endScreen(int *, int *);
+void cheat(int *);
 
 class question
 {
@@ -78,42 +79,32 @@ void MoveRight(int *xptr){
     }
 }
 
-//Function to animate answers
-void Animate(int answer, int decoy1, int decoy2, int rectY, int ansL, int d1L, int d2L){
-    int x1=20, x2=60, x3=100, rectH=30, rectW=40;
-    while (rectY<135){
-        LCD.SetFontColor(BLACK);
-        LCD.FillRectangle(x1, rectY, rectW, rectH);
-        LCD.FillRectangle(x2, rectY, rectW, rectH);
-        LCD.FillRectangle(x3, rectY, rectW, rectH);
+//Function to show endscreen
+void endScreen(int *score, int *qptr){
+    LCD.SetBackgroundColor(BLACK);
+    LCD.Clear();
+    LCD.SetFontScale(1); 
+    LCD.WriteAt("YOU CRASHED!", 80, 200); 
+    LCD.WriteAt("SCORE: ", 60, 50); 
+    LCD.WriteAt(*score, 180, 50); 
+    Sleep(4.0); 
+    MainMenu(qptr); 
+}
 
-        LCD.SetFontColor(WHITE);
-        LCD.DrawLine(160, 0, 160, 240);
-        LCD.DrawLine(20, 0, 20, 240);
-        LCD.DrawLine(1, 0, 1, 240);
-        LCD.DrawLine(140, 0, 140, 240);
-        LCD.DrawLine(60, 0, 60, 240);
-        LCD.DrawLine(100, 0, 100, 240);
-        LCD.Update();
-       
-        rectY+=1;
-
-        //Redraw rectanlges and answers
-        LCD.DrawRectangle(ansL, rectY, rectW, rectH);
-        LCD.WriteAt(answer, ansL+5, rectY+5);
-        LCD.DrawRectangle(d1L, rectY, rectW, rectH);
-        LCD.WriteAt(decoy1, d1L+5, rectY+5);
-        LCD.DrawRectangle(d2L, rectY, rectW, rectH);
-        LCD.WriteAt(decoy2, d2L+5, rectY+5);
-        LCD.Update();
-    }
-
-
+//Function when cheating
+void cheat(int *qptr){
+    int fail=0;
+    LCD.SetBackgroundColor(BLACK);
+    LCD.Clear();
+    LCD.SetFontScale(1.5); 
+    LCD.WriteAt("CHEATER!", 100, 200); 
+    Sleep(4.0); 
+    MainMenu(qptr); 
 }
 
 
 //Function to start game
-void StartGame(int level)
+void StartGame(int level, int *qptr, int *tptr)
 {
     //Clear screen
     LCD.SetBackgroundColor(BLACK);
@@ -125,7 +116,6 @@ void StartGame(int level)
         int x1 = 170, y1 = 20, width = 120, height = 30;
         int touchx, touchy;
         bool keepTrackingClicks = true, game = true;
-
 
         // Draw Main Menu button
         LCD.SetFontColor(RED);
@@ -164,18 +154,21 @@ void StartGame(int level)
         {
             while(!LCD.Touch(&touchx, &touchy))
             {
+                LCD.SetFontScale(1);
                 //Move options down
                 int gameState = levelOne.moveAnswers(xptr);
 
                 if (gameState == 2)
                 {
-                   
-                    StartGame(1);
-
+                    (*tptr)++;
+                    if ((*tptr)>(*qptr)){
+                        (*qptr)=(*tptr);
+                    }
+                    StartGame(1, qptr, tptr);
 
                 } else if (gameState == 0)
                 {
-                    MainMenu();
+                    endScreen(tptr, qptr);
                 }
                
             }
@@ -188,7 +181,7 @@ void StartGame(int level)
                
                 if (TimeNow() - timeStart > 0.6)
                 {
-                    MainMenu();
+                    cheat(qptr);
                 }
 
                
@@ -197,7 +190,7 @@ void StartGame(int level)
 
             if (touchx < x1+width && touchx > x1 && touchy > y1 && touchy < y1+height)
             {
-                MainMenu();
+                MainMenu(qptr);
                 keepTrackingClicks = false;
             } else if (touchx < rectX+(rectW/2) && touchx > rectX && touchy > rectY && touchy < rectY+rectH){
                 //Move car left
@@ -252,7 +245,7 @@ void StartGame(int level)
 
             if (touchx < x1+width && touchx > x1 && touchy > y1 && touchy < y1+height)
             {
-                MainMenu();
+                MainMenu(qptr);
                 keepTrackingClicks = false;
             } else if (touchx < rectX+(rectW/2) && touchx > rectX && touchy > rectY && touchy < rectY+rectH){
                 //Move car left
@@ -307,7 +300,7 @@ void StartGame(int level)
 
             if (touchx < x1+width && touchx > x1 && touchy > y1 && touchy < y1+height)
             {
-                MainMenu();
+                MainMenu(qptr);
                 keepTrackingClicks = false;
             } else if (touchx < rectX+(rectW/2) && touchx > rectX && touchy > rectY && touchy < rectY+rectH){
                 //Move car left
@@ -326,12 +319,13 @@ void StartGame(int level)
 }
 
 //Function to switch the screen.
-void SwitchScreen(int screen)
+void SwitchScreen(int screen, int *qptr)
 {
-    int questionsAnswered = 0;
     int x1 = 170, y1 = 20, width = 120, height = 30;
     int touchx, touchy;
     bool keepTrackingClicks = true;
+    int tempScore=0, *tptr;
+    tptr=&tempScore;
 
     if (screen == 1)
     {
@@ -373,20 +367,20 @@ void SwitchScreen(int screen)
             if (touchx < x1+width && touchx > x1 && touchy > y1 && touchy < y1+height)
             {
 
-                MainMenu();
+                MainMenu(qptr);
                 keepTrackingClicks = false;
 
             } else if (touchx < levelButtonx+levelButtonWidth && touchx > levelButtonx && touchy > levelButtony && touchy < levelButtony+levelButtonHeight)
             {
-                StartGame(1);
+                StartGame(1, qptr, tptr);
                 keepTrackingClicks = false;
             } else if (touchx < levelButtonx+levelButtonWidth && touchx > levelButtonx && touchy > levelButtony2 && touchy < levelButtony2+levelButtonHeight)
             {
-                StartGame(2);
+                StartGame(2, qptr, tptr);
                 keepTrackingClicks = false;
             } else if (touchx < levelButtonx+levelButtonWidth && touchx > levelButtonx && touchy > levelButtony3 && touchy < levelButtony3+levelButtonHeight)
             {
-                StartGame(3);
+                StartGame(3, qptr, tptr);
                 keepTrackingClicks = false;
             }
         }
@@ -400,9 +394,8 @@ void SwitchScreen(int screen)
         LCD.Clear();
 
         //Write statistics
-        LCD.WriteAt("Statistics:", 100, 60);
-        LCD.WriteAt("Questions Answered:", 55, 90);
-        LCD.WriteAt(questionsAnswered, 150, 115);
+        LCD.WriteAt("High Score:", 95, 100);
+        LCD.WriteAt((*qptr), 150, 125);
 
         // Draw Main Menu button
         LCD.SetFontColor(RED);
@@ -419,7 +412,7 @@ void SwitchScreen(int screen)
 
             if (touchx < x1+width && touchx > x1 && touchy > y1 && touchy < y1+height)
             {
-                MainMenu();
+                MainMenu(qptr);
                 keepTrackingClicks = false;
             }
         }
@@ -455,7 +448,7 @@ void SwitchScreen(int screen)
 
             if (touchx < x1+width && touchx > x1 && touchy > y1 && touchy < y1+height)
             {
-                MainMenu();
+                MainMenu(qptr);
                 keepTrackingClicks = false;
             }
         }
@@ -489,7 +482,7 @@ void SwitchScreen(int screen)
 
             if (touchx < x1+width && touchx > x1 && touchy > y1 && touchy < y1+height)
             {
-                MainMenu();
+                MainMenu(qptr);
                 keepTrackingClicks = false;
             }
         }
@@ -499,7 +492,7 @@ void SwitchScreen(int screen)
 
 }
 
-void MainMenu() {
+void MainMenu(int *qptr) {
     int x1 = 130, y1 = 30;
     int x2 = 65, y2 = 70;
     int x3 = 75, y3 = 110;
@@ -510,6 +503,7 @@ void MainMenu() {
     int width4 = 100, height4 = 30;
     int touchx, touchy;
     bool keepTrackingClicks = true;
+
 
     //Clear screen
     LCD.SetBackgroundColor(BLACK);
@@ -548,19 +542,19 @@ void MainMenu() {
 
         if (touchx < x1+width && touchx > x1 && touchy > y1 && touchy < y1+height)
         {
-            SwitchScreen(1);
+            SwitchScreen(1, qptr);
             keepTrackingClicks = false;
         } else if (touchx < x2+width2 && touchx > x2 && touchy > y2 && touchy < y2+height2)
         {
-            SwitchScreen(2);
+            SwitchScreen(2, qptr);
             keepTrackingClicks = false;
         } else if (touchx < x3+width3 && touchx > x3 && touchy > y3 && touchy < y3+height3)
         {
-            SwitchScreen(3);
+            SwitchScreen(3, qptr);
             keepTrackingClicks = false;
         } else if (touchx < x4+width4 && touchx > x4 && touchy > y4 && touchy < y4+height4)
         {
-            SwitchScreen(4);
+            SwitchScreen(4, qptr);
             keepTrackingClicks = false;
         }
     }
@@ -573,7 +567,9 @@ int main() {
     LCD.SetBackgroundColor(BLACK);
     LCD.Clear();
 
-    MainMenu();
+    int qAns=0, *qptr;
+    qptr=&qAns;
+    MainMenu(qptr);
 
     while (1) {
         LCD.Update();
