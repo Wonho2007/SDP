@@ -10,7 +10,7 @@ void StartGame(int);
 void SwitchScreen(int);
 void MoveLeft(int *);
 void MoveRight(int *);
-void endScreen();
+void Animate(int, int, int, int, int, int, int);
 
 class question
 {
@@ -32,16 +32,6 @@ public:
     void random();
     int moveAnswers(int *);
 };
-
-//Function to make endscreen
-void endScreen(){
-    LCD.SetBackgroundColor(BLACK);
-    LCD.SetFontScale(1.5);
-    LCD.Clear();
-    LCD.WriteAt("YOU CRASHED!", 100, 200);
-    Sleep(5.0);
-    MainMenu();
-}
 
 //Function to move car left
 void MoveLeft(int *xptr){
@@ -88,6 +78,39 @@ void MoveRight(int *xptr){
     }
 }
 
+//Function to animate answers
+void Animate(int answer, int decoy1, int decoy2, int rectY, int ansL, int d1L, int d2L){
+    int x1=20, x2=60, x3=100, rectH=30, rectW=40;
+    while (rectY<135){
+        LCD.SetFontColor(BLACK);
+        LCD.FillRectangle(x1, rectY, rectW, rectH);
+        LCD.FillRectangle(x2, rectY, rectW, rectH);
+        LCD.FillRectangle(x3, rectY, rectW, rectH);
+
+        LCD.SetFontColor(WHITE);
+        LCD.DrawLine(160, 0, 160, 240);
+        LCD.DrawLine(20, 0, 20, 240);
+        LCD.DrawLine(1, 0, 1, 240);
+        LCD.DrawLine(140, 0, 140, 240);
+        LCD.DrawLine(60, 0, 60, 240);
+        LCD.DrawLine(100, 0, 100, 240);
+        LCD.Update();
+       
+        rectY+=1;
+
+        //Redraw rectanlges and answers
+        LCD.DrawRectangle(ansL, rectY, rectW, rectH);
+        LCD.WriteAt(answer, ansL+5, rectY+5);
+        LCD.DrawRectangle(d1L, rectY, rectW, rectH);
+        LCD.WriteAt(decoy1, d1L+5, rectY+5);
+        LCD.DrawRectangle(d2L, rectY, rectW, rectH);
+        LCD.WriteAt(decoy2, d2L+5, rectY+5);
+        LCD.Update();
+    }
+
+
+}
+
 
 //Function to start game
 void StartGame(int level)
@@ -98,7 +121,7 @@ void StartGame(int level)
 
     if (level == 1)
     {
-        
+       
         int x1 = 170, y1 = 20, width = 120, height = 30;
         int touchx, touchy;
         bool keepTrackingClicks = true, game = true;
@@ -118,7 +141,7 @@ void StartGame(int level)
         LCD.WriteAt("<--", 178, 175);
         LCD.WriteAt("-->", 238, 175);
         LCD.Update();
-        
+       
         //Import car image and draw
         FEHImage car("car.png");
         int carx=70, cary=160, *xptr=&carx;
@@ -139,46 +162,22 @@ void StartGame(int level)
 
         while (keepTrackingClicks)
         {
-            int gameState=levelOne.moveAnswers(xptr);
-            while(gameState==2){
-                while(!LCD.Touch(&touchx, &touchy))
+            while(!LCD.Touch(&touchx, &touchy))
+            {
+                //Move options down
+                int gameState = levelOne.moveAnswers(xptr);
+
+                if (gameState == 2)
                 {
-                    //Move options down
-                    gameState=levelOne.moveAnswers(xptr);
-                    if (gameState==2)
-                    {
-
-                        //questionsAnswered++;
-
-                    } else if (gameState==0)
-                    {
-                        endScreen();
-                    }
-
-                    
-                }
-
-                while(LCD.Touch(&touchx, &touchy))
-                {
-                    
-                }
+                   
+                    StartGame(1);
 
 
-                if (touchx < x1+width && touchx > x1 && touchy > y1 && touchy < y1+height)
+                } else if (gameState == 0)
                 {
                     MainMenu();
-                    keepTrackingClicks = false;
-                } else if (touchx < rectX+(rectW/2) && touchx > rectX && touchy > rectY && touchy < rectY+rectH){
-                    //Move car left
-                    MoveLeft(xptr);
-                    
-
-
-                } else if (touchx < rectX+rectW && touchx > rectX+(rectW/2) && touchy > rectY && touchy < rectY+rectH){
-                    //Move car right
-                    MoveRight(xptr);
                 }
-                
+               
             }
 
             //Make sure user is not holding button for too long
@@ -186,13 +185,13 @@ void StartGame(int level)
 
             while(LCD.Touch(&touchx, &touchy))
             {
-                
+               
                 if (TimeNow() - timeStart > 0.6)
                 {
                     MainMenu();
                 }
 
-                
+               
             }
 
 
@@ -203,14 +202,13 @@ void StartGame(int level)
             } else if (touchx < rectX+(rectW/2) && touchx > rectX && touchy > rectY && touchy < rectY+rectH){
                 //Move car left
                 MoveLeft(xptr);
-                
+               
 
 
             } else if (touchx < rectX+rectW && touchx > rectX+(rectW/2) && touchy > rectY && touchy < rectY+rectH){
                 //Move car right
                 MoveRight(xptr);
             }
-            
         }
     } else if (level == 2)
     {
@@ -259,7 +257,7 @@ void StartGame(int level)
             } else if (touchx < rectX+(rectW/2) && touchx > rectX && touchy > rectY && touchy < rectY+rectH){
                 //Move car left
                 LCD.WriteAt("left", touchx, touchy);
-                
+               
             } else if (touchx < rectX+rectW && touchx > rectX+(rectW/2) && touchy > rectY && touchy < rectY+rectH){
                 //Move car right
                 LCD.WriteAt("right", touchx, touchy);
@@ -314,7 +312,7 @@ void StartGame(int level)
             } else if (touchx < rectX+(rectW/2) && touchx > rectX && touchy > rectY && touchy < rectY+rectH){
                 //Move car left
                 LCD.WriteAt("left", touchx, touchy);
-                
+               
             } else if (touchx < rectX+rectW && touchx > rectX+(rectW/2) && touchy > rectY && touchy < rectY+rectH){
                 //Move car right
                 LCD.WriteAt("right", touchx, touchy);
@@ -351,7 +349,7 @@ void SwitchScreen(int screen)
         // Draw Difficulty buttons
         int levelButtonx = 110, levelButtony = 60, levelButtonWidth = 100, levelButtonHeight = 30;
         int levelButtony2 = levelButtony+40;
-        int levelButtony3 = levelButtony2+40; 
+        int levelButtony3 = levelButtony2+40;
 
         LCD.SetFontScale(1);
         LCD.SetFontColor(RED);
@@ -363,7 +361,7 @@ void SwitchScreen(int screen)
 
         LCD.DrawRectangle(levelButtonx, levelButtony3, levelButtonWidth, levelButtonHeight);
         LCD.WriteAt("LEVEL 3", levelButtonx+5, levelButtony3+5);
-        
+       
 
         //Check what button the player clicks
         while (keepTrackingClicks)
@@ -390,7 +388,7 @@ void SwitchScreen(int screen)
             {
                 StartGame(3);
                 keepTrackingClicks = false;
-            } 
+            }
         }
 
 
@@ -441,12 +439,12 @@ void SwitchScreen(int screen)
         //Write statistics
         LCD.SetFontScale(0.5);
         LCD.WriteAt("Instructions:", 120, 60);
-        LCD.WriteAt("When a question appears", 90, 90); 
+        LCD.WriteAt("When a question appears", 90, 90);
         LCD.WriteAt("use the arrows to move", 90, 120);
         LCD.WriteAt("the car to the lane", 100, 150);
         LCD.WriteAt("with the correct answer!", 85, 180);
 
-        
+       
 
         //Check if player clicks main menu button
         while (keepTrackingClicks)
@@ -477,10 +475,10 @@ void SwitchScreen(int screen)
         //Write credits
         LCD.SetFontScale(1);
         LCD.WriteAt("Creators:", 106, 60);
-        LCD.WriteAt("Wonho Lee", 110, 90); 
+        LCD.WriteAt("Wonho Lee", 110, 90);
         LCD.WriteAt("Ashlea Budzinski", 60, 120);
 
-        
+       
 
         //Check if player clicks main menu button
         while (keepTrackingClicks)
@@ -608,9 +606,9 @@ int question::moveAnswers(int *xptr)
     if (*xptr == correctX+10 && answerY >= 160-30)
     {
         //You win
-        
+       
         LCD.Write("You Win");
-        
+       
         return(2);
 
 
@@ -618,7 +616,7 @@ int question::moveAnswers(int *xptr)
     {
         //Draw over old answers
         int x1=20, x2=60, x3=100, rectH=30, rectW=40;
-    
+   
         LCD.SetFontColor(BLACK);
         LCD.FillRectangle(x1, answerY, rectW, rectH);
         LCD.FillRectangle(x2, answerY, rectW, rectH);
@@ -643,7 +641,7 @@ int question::moveAnswers(int *xptr)
         LCD.DrawRectangle(decoy2X, answerY, rectW, rectH);
         LCD.WriteAt(decoy2, decoy2X+5, answerY+5);
         LCD.Update();
-    
+   
 
         return(1);
 
@@ -686,7 +684,7 @@ void question::random()
             {
                 num2 = b;
             }
-            
+           
         }
 
         //Pick random addition or subtraction, print question
@@ -740,7 +738,7 @@ void question::random()
                 correctX = 20;
                 LCD.DrawRectangle(correctX, rectY, rectW, 30);
                 LCD.WriteAt(answer, correctX+5, rectY+5);
-                
+               
 
                 //Draw decoy answer
                 decoy1X = 60;
@@ -753,7 +751,7 @@ void question::random()
                 if (decoy2 <= 0)
                 {
                    decoy2 = answer + randomNumber + 5;
-                } 
+                }
 
                 decoy2X = 100;
                 LCD.DrawRectangle(decoy2X, rectY, rectW, 30);
@@ -770,7 +768,7 @@ void question::random()
                 correctX=60; //Store answer location
                 LCD.DrawRectangle(correctX, rectY, rectW, 30);
                 LCD.WriteAt(answer, correctX+5, rectY+5);
-                
+               
 
                 //Draw decoy answer
                 decoy1X = 20;
@@ -783,7 +781,7 @@ void question::random()
                 if (decoy2 <= 0)
                 {
                    decoy2 = answer + randomNumber + 5;
-                } 
+                }
 
                 decoy2X = 100;
                 LCD.DrawRectangle(decoy2X, rectY, rectW, 30);
@@ -800,7 +798,7 @@ void question::random()
                 correctX=100; //Store answer location
                 LCD.DrawRectangle(correctX, rectY, 40, 30);
                 LCD.WriteAt(answer, correctX+5, rectY+5);
-                
+               
 
                 //Draw decoy answer
                 decoy1X = 60;
@@ -813,7 +811,7 @@ void question::random()
                 if (decoy2 <= 0)
                 {
                    decoy2 = answer + randomNumber + 5;
-                } 
+                }
 
                 decoy2X = 20;
                 LCD.DrawRectangle(decoy2X, rectY, rectW, 30);
@@ -830,7 +828,7 @@ void question::random()
 
         }
 
-        
+       
 
 
 
@@ -857,7 +855,7 @@ void question::random()
             {
                 num2 = b;
             }
-            
+           
         }
 
         //Pick random division, print question
@@ -870,7 +868,7 @@ void question::random()
         LCD.WriteAt('X', 150, 15);
         LCD.WriteAt(num2, 170, 15);
 
-    
+   
         //Pick random 1-3 gate that the answer falls through.
         while (decoy2 == 0)
         {
@@ -889,7 +887,7 @@ void question::random()
                 if (decoy1%2 == 0)
                 {
                     decoy1 = answer-a;
-                } else 
+                } else
                 {
                     decoy1 = answer+a;
                 }
@@ -901,15 +899,15 @@ void question::random()
                 if (randomNumber%2 == 0)
                 {
                     decoy2 = answer-b;
-                } else 
+                } else
                 {
                     decoy2 = answer+b;
                 }
-                
-            
+               
+           
                 LCD.DrawRectangle(210, 40, 50, 30);
                 LCD.WriteAt(decoy2, 210+5, 40+5);
-                
+               
 
             } else if (randomNumber > 15 && randomNumber < 20)
             {
@@ -927,12 +925,12 @@ void question::random()
                 if (randomNumber%2 == 0)
                 {
                     decoy2 = answer-b;
-                } else 
+                } else
                 {
                     decoy2 = answer+b;
                 }
-                
-            
+               
+           
                 LCD.DrawRectangle(210, 40, 50, 30);
                 LCD.WriteAt(decoy2, 210+5, 40+5);
 
@@ -952,12 +950,12 @@ void question::random()
                 if (randomNumber%2 == 0)
                 {
                     decoy2 = answer-b;
-                } else 
+                } else
                 {
                     decoy2 = answer+b;
                 }
-                
-            
+               
+           
                 LCD.DrawRectangle(50, 40, 50, 30);
                 LCD.WriteAt(decoy2, 50+5, 40+5);
 
@@ -967,7 +965,7 @@ void question::random()
 
         }
 
-        
+       
 
 
 
@@ -996,7 +994,7 @@ void question::random()
             {
                 num2 = b;
             }
-            
+           
         }
 
 
@@ -1041,7 +1039,7 @@ void question::random()
                 if (c%2 == 0)
                 {
                     decoy1 = answer-a;
-                } else 
+                } else
                 {
                     decoy1 = answer+a;
                 }
@@ -1054,15 +1052,15 @@ void question::random()
                 if (randomNumber%2 == 0)
                 {
                     decoy2 = answer-b;
-                } else 
+                } else
                 {
                     decoy2 = answer+b;
                 }
-                
-            
+               
+           
                 LCD.DrawRectangle(210, 40, 50, 30);
                 LCD.WriteAt(decoy2, 210+5, 40+5);
-                
+               
 
             } else if (randomNumber > 15 && randomNumber < 20)
             {
@@ -1076,7 +1074,7 @@ void question::random()
                 if (c%2 == 0)
                 {
                     decoy1 = answer-a;
-                } else 
+                } else
                 {
                     decoy1 = answer+a;
                 }
@@ -1088,12 +1086,12 @@ void question::random()
                 if (randomNumber%2 == 0)
                 {
                     decoy2 = answer-b;
-                } else 
+                } else
                 {
                     decoy2 = answer+b;
                 }
-                
-            
+               
+           
                 LCD.DrawRectangle(210, 40, 50, 30);
                 LCD.WriteAt(decoy2, 210+5, 40+5);
 
@@ -1109,11 +1107,11 @@ void question::random()
                 if (c%2 == 0)
                 {
                     decoy1 = answer-a;
-                } else 
+                } else
                 {
                     decoy1 = answer+a;
                 }
-                
+               
                 LCD.DrawRectangle(130, 40, 50, 30);
                 LCD.WriteAt(decoy1, 130+5, 40+5);
 
@@ -1121,12 +1119,12 @@ void question::random()
                 if (randomNumber%2 == 0)
                 {
                     decoy2 = answer-b;
-                } else 
+                } else
                 {
                     decoy2 = answer+b;
                 }
-                
-            
+               
+           
                 LCD.DrawRectangle(50, 40, 50, 30);
                 LCD.WriteAt(decoy2, 50+5, 40+5);
 
@@ -1135,13 +1133,13 @@ void question::random()
 
 
         }
-        
+       
 
 
 
 
     }
-    
-    
+   
+   
 
 }
