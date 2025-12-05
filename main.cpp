@@ -121,7 +121,7 @@ void StartGame(int level)
 
     if (level == 1)
     {
-        int questionsAnswered = 0;
+        
         int x1 = 170, y1 = 20, width = 120, height = 30;
         int touchx, touchy;
         bool keepTrackingClicks = true, game = true;
@@ -169,7 +169,9 @@ void StartGame(int level)
 
                 if (gameState == 2)
                 {
-                    questionsAnswered++;
+                    
+                    StartGame(1);
+
 
                 } else if (gameState == 0)
                 {
@@ -178,8 +180,17 @@ void StartGame(int level)
                 
             }
 
+            //Make sure user is not holding button for too long
+            float timeStart = TimeNow();
+
             while(LCD.Touch(&touchx, &touchy))
             {
+                
+                if (TimeNow() - timeStart > 0.6)
+                {
+                    MainMenu();
+                }
+
                 
             }
 
@@ -622,7 +633,7 @@ int question::moveAnswers(int *xptr)
        
         answerY+=1;
 
-        //Redraw rectanlges and answers
+        //Redraw rectangles and answers
         LCD.DrawRectangle(correctX, answerY, rectW, rectH);
         LCD.WriteAt(answer, correctX+5, answerY+5);
         LCD.DrawRectangle(decoy1X, answerY, rectW, rectH);
@@ -631,14 +642,12 @@ int question::moveAnswers(int *xptr)
         LCD.WriteAt(decoy2, decoy2X+5, answerY+5);
         LCD.Update();
     
-        //Draw new answers
 
         return(1);
 
     }else
     {
-        //Lose
-        LCD.Write("You Lose");
+       
         return(0);
     }
 }
