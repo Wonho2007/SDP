@@ -4,10 +4,11 @@
 #include "FEHUtility.h"
 #include "FEHRandom.h"
 #include "FEHImages.h"
+#include "FEHSound.h"
 
 void MainMenu(int *);
-void StartGame(int, int *, int *);
-void SwitchScreen(int, int *);
+void StartGame(int, int *, int *, FEHSound);
+void SwitchScreen(int, int *, FEHSound);
 void MoveLeft(int *);
 void MoveRight(int *);
 void endScreen(int *, int *);
@@ -82,6 +83,7 @@ void MoveRight(int *xptr){
 //Function to show endscreen
 void endScreen(int *score, int *qptr){
     LCD.SetBackgroundColor(BLACK);
+    LCD.SetFontColor(WHITE);
     LCD.Clear();
     LCD.SetFontScale(1); 
     LCD.WriteAt("YOU CRASHED!", 85, 180); 
@@ -126,7 +128,7 @@ void cheat(int *qptr){
 
 
 //Function to start game
-void StartGame(int level, int *qptr, int *tptr)
+void StartGame(int level, int *qptr, int *tptr, FEHSound music)
 {
     //Clear screen
     LCD.SetBackgroundColor(BLACK);
@@ -194,10 +196,28 @@ void StartGame(int level, int *qptr, int *tptr)
                     if ((*tptr)>(*qptr)){
                         (*qptr)=(*tptr);
                     }
-                    StartGame(1, qptr, tptr);
+                    StartGame(1, qptr, tptr, music);
 
                 } else if (gameState == 0)
                 {
+                    //Draw car explosion, play sound effect
+                    music.pause();
+                    FEHImage explosion("explosion.png");
+                    FEHImage explosionBig("explosionBig.png");
+                    FEHSound explosionSound("explosionSound.wav");
+                    explosionSound.restart();
+
+                    LCD.SetFontColor(BLACK);
+                    LCD.FillRectangle(carx, cary, 25, 45); // Draw over old car
+                    LCD.FillRectangle(170, 202, 115, 38);
+                    
+                    explosion.Draw(carx-15, cary);
+                    LCD.Update();
+                    Sleep(0.1);
+                    explosionBig.Draw(carx-30, cary-10);
+                    LCD.Update();
+                    Sleep(0.3);
+
                     endScreen(tptr, qptr);
                 }
                
@@ -295,10 +315,28 @@ void StartGame(int level, int *qptr, int *tptr)
                     if ((*tptr)>(*qptr)){
                         (*qptr)=(*tptr);
                     }
-                    StartGame(2, qptr, tptr);
+                    StartGame(2, qptr, tptr, music);
 
                 } else if (gameState == 0)
                 {
+                    //Draw car explosion
+                    music.pause();
+                    FEHImage explosion("explosion.png");
+                    FEHImage explosionBig("explosionBig.png");
+                    FEHSound explosionSound("explosionSound.wav");
+                    explosionSound.restart();
+
+                    LCD.SetFontColor(BLACK);
+                    LCD.FillRectangle(carx, cary, 25, 45); // Draw over old car
+                    LCD.FillRectangle(170, 202, 115, 38);
+
+                    explosion.Draw(carx-15, cary);
+                    LCD.Update();
+                    Sleep(0.1);
+                    explosionBig.Draw(carx-30, cary-10);
+                    LCD.Update();
+                    Sleep(0.3);
+
                     endScreen(tptr, qptr);
                 }
                
@@ -395,10 +433,28 @@ void StartGame(int level, int *qptr, int *tptr)
                     if ((*tptr)>(*qptr)){
                         (*qptr)=(*tptr);
                     }
-                    StartGame(3, qptr, tptr);
+                    StartGame(3, qptr, tptr, music);
 
                 } else if (gameState == 0)
                 {
+                    //Draw car explosion
+                    music.pause();
+                    FEHImage explosion("explosion.png");
+                    FEHImage explosionBig("explosionBig.png");
+                    FEHSound explosionSound("explosionSound.wav");
+                    explosionSound.restart();
+
+                    LCD.SetFontColor(BLACK);
+                    LCD.FillRectangle(carx, cary, 25, 45); // Draw over old car
+                    LCD.FillRectangle(170, 202, 115, 38);
+
+                    explosion.Draw(carx-15, cary);
+                    LCD.Update();
+                    Sleep(0.1);
+                    explosionBig.Draw(carx-30, cary-10);
+                    LCD.Update();
+                    Sleep(0.3);
+
                     endScreen(tptr, qptr);
                 }
                
@@ -438,13 +494,14 @@ void StartGame(int level, int *qptr, int *tptr)
 }
 
 //Function to switch the screen.
-void SwitchScreen(int screen, int *qptr)
+void SwitchScreen(int screen, int *qptr, FEHSound sound)
 {
     int x1 = 170, y1 = 20, width = 120, height = 30;
     int touchx, touchy;
     bool keepTrackingClicks = true;
     int tempScore=0, *tptr;
     tptr=&tempScore;
+
 
     if (screen == 1)
     {
@@ -485,21 +542,30 @@ void SwitchScreen(int screen, int *qptr)
 
             if (touchx < x1+width && touchx > x1 && touchy > y1 && touchy < y1+height)
             {
-
+                sound.pause();
                 MainMenu(qptr);
                 keepTrackingClicks = false;
 
             } else if (touchx < levelButtonx+levelButtonWidth && touchx > levelButtonx && touchy > levelButtony && touchy < levelButtony+levelButtonHeight)
             {
-                StartGame(1, qptr, tptr);
+                sound.pause();
+                FEHSound coconutMall("coconutMall.wav");
+                coconutMall.restart();
+                StartGame(1, qptr, tptr, coconutMall);
                 keepTrackingClicks = false;
             } else if (touchx < levelButtonx+levelButtonWidth && touchx > levelButtonx && touchy > levelButtony2 && touchy < levelButtony2+levelButtonHeight)
             {
-                StartGame(2, qptr, tptr);
+                sound.pause();
+                FEHSound coconutMall("coconutMall.wav");
+                coconutMall.restart();
+                StartGame(2, qptr, tptr, coconutMall);
                 keepTrackingClicks = false;
             } else if (touchx < levelButtonx+levelButtonWidth && touchx > levelButtonx && touchy > levelButtony3 && touchy < levelButtony3+levelButtonHeight)
             {
-                StartGame(3, qptr, tptr);
+                sound.pause();
+                FEHSound coconutMall("coconutMall.wav");
+                coconutMall.restart();
+                StartGame(3, qptr, tptr, coconutMall);
                 keepTrackingClicks = false;
             }
         }
@@ -613,10 +679,10 @@ void SwitchScreen(int screen, int *qptr)
 }
 
 void MainMenu(int *qptr) {
-    int x1 = 130, y1 = 30;
-    int x2 = 65, y2 = 70;
-    int x3 = 75, y3 = 110;
-    int x4 = 110, y4 = 150;
+    int x1 = 130, y1 = 80;
+    int x2 = 65, y2 = 120;
+    int x3 = 75, y3 = 160;
+    int x4 = 110, y4 = 200;
     int width = 60, height = 30;
     int width2 = 190, height2 = 30;
     int width3 = 170, height3 = 30;
@@ -624,33 +690,58 @@ void MainMenu(int *qptr) {
     int touchx, touchy;
     bool keepTrackingClicks = true;
 
+    FEHSound mainMenuMusic("mainMenuMusic.wav");
+    mainMenuMusic.restart();
 
     //Clear screen
     LCD.SetBackgroundColor(BLACK);
     LCD.Clear();
+
+
+    //Write title of game
+    LCD.SetFontScale(1.5);
+    LCD.SetFontColor(WHITE);
+    LCD.WriteAt("GAME", 123, 10);
+    LCD.Update();
+    Sleep(0.4);
+
+    LCD.SetFontScale(1.5);
+    LCD.SetFontColor(WHITE);
+    LCD.WriteAt("NAME", 123, 45);
+    LCD.Update();
+
+    Sleep(0.8);
 
     // Draw Play button
     LCD.SetFontScale(1);
     LCD.SetFontColor(RED);
     LCD.DrawRectangle(x1, y1, width, height);
     LCD.WriteAt("PLAY", x1+5, y1+5);
+    Sleep(0.2);
+    LCD.Update();
 
     // Draw Statistics button
     LCD.SetFontColor(RED);
     LCD.DrawRectangle(x2, y2, width2, height2);
     LCD.WriteAt("VIEW STATISTICS", x2+5, y2+5);
+    Sleep(0.2);
+    LCD.Update();
 
     // Draw Instructions button
     LCD.SetFontColor(RED);
     LCD.DrawRectangle(x3, y3, width3, height3);
     LCD.WriteAt("INSTRUCTIONS", x3+12, y3+5);
+    Sleep(0.2);
+    LCD.Update();
 
     // Draw Credits button
     LCD.SetFontColor(RED);
     LCD.DrawRectangle(x4, y4, width4, height4);
     LCD.WriteAt("CREDITS", x4+7, y4+5);
+    Sleep(0.2);
+    LCD.Update();
 
-
+    Sleep(0.2);
     LCD.Update();
 
     //See where the player clicks and move to the corresponding screen
@@ -662,19 +753,22 @@ void MainMenu(int *qptr) {
 
         if (touchx < x1+width && touchx > x1 && touchy > y1 && touchy < y1+height)
         {
-            SwitchScreen(1, qptr);
+            SwitchScreen(1, qptr, mainMenuMusic);
             keepTrackingClicks = false;
         } else if (touchx < x2+width2 && touchx > x2 && touchy > y2 && touchy < y2+height2)
         {
-            SwitchScreen(2, qptr);
+            mainMenuMusic.pause();
+            SwitchScreen(2, qptr, mainMenuMusic);
             keepTrackingClicks = false;
         } else if (touchx < x3+width3 && touchx > x3 && touchy > y3 && touchy < y3+height3)
         {
-            SwitchScreen(3, qptr);
+            mainMenuMusic.pause();
+            SwitchScreen(3, qptr, mainMenuMusic);
             keepTrackingClicks = false;
         } else if (touchx < x4+width4 && touchx > x4 && touchy > y4 && touchy < y4+height4)
         {
-            SwitchScreen(4, qptr);
+            mainMenuMusic.pause();
+            SwitchScreen(4, qptr, mainMenuMusic);
             keepTrackingClicks = false;
         }
     }
@@ -698,6 +792,7 @@ int main() {
     return 0;
 }
 
+//Constructor for question function 
 question::question(int l, int a, int b, int x, int y, int z, int c, int d, int e)
 {
 
