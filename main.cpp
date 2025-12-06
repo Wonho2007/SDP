@@ -12,7 +12,7 @@ void SwitchScreen(int, int *, FEHSound);
 void MoveLeft(int *);
 void MoveRight(int *);
 void endScreen(int *, int *);
-void cheat(int *);
+void cheat(int *, FEHSound);
 
 class question
 {
@@ -105,8 +105,14 @@ void endScreen(int *score, int *qptr){
 }
 
 //Function when cheating
-void cheat(int *qptr){
+void cheat(int *qptr, FEHSound music){
     int fail=0;
+
+    //Stop music
+    music.pause();
+    FEHSound explosionSound("explosionSound.wav");
+    explosionSound.restart();
+
     LCD.SetBackgroundColor(BLACK);
     LCD.Clear();
     LCD.SetFontScale(1.5); 
@@ -231,7 +237,7 @@ void StartGame(int level, int *qptr, int *tptr, FEHSound music)
                
                 if (TimeNow() - timeStart > 0.6)
                 {
-                    cheat(qptr);
+                    cheat(qptr, music);
                 }
 
                
@@ -350,7 +356,7 @@ void StartGame(int level, int *qptr, int *tptr, FEHSound music)
                
                 if (TimeNow() - timeStart > 0.6)
                 {
-                    cheat(qptr);
+                    cheat(qptr, music);
                 }
 
                
@@ -468,7 +474,7 @@ void StartGame(int level, int *qptr, int *tptr, FEHSound music)
                
                 if (TimeNow() - timeStart > 0.6)
                 {
-                    cheat(qptr);
+                    cheat(qptr, music);
                 }
 
                
