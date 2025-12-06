@@ -624,7 +624,7 @@ void SwitchScreen(int screen, int *qptr, FEHSound sound)
         LCD.SetFontScale(0.5);
         LCD.WriteAt("Instructions:", 120, 60);
         LCD.WriteAt("When a question appears", 90, 90);
-        LCD.WriteAt("use the arrows to move", 90, 120);
+        LCD.WriteAt("click the arrows to move", 86, 120);
         LCD.WriteAt("the car to the lane", 100, 150);
         LCD.WriteAt("with the correct answer!", 85, 180);
         LCD.WriteAt("Don't hold the arrows!", 90, 210);
