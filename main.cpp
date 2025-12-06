@@ -1283,8 +1283,8 @@ void question::random()
         LCD.WriteAt(num1, 180, 90);
         LCD.WriteAt('X', 210, 90);
         LCD.WriteAt(num2, 230, 90);
-        LCD.WriteAt('+', 250, 90);
-        LCD.WriteAt(num3, 270, 90);
+        LCD.WriteAt('+', 260, 90);
+        LCD.WriteAt(num3, 280, 90);
 
 
 
