@@ -1145,7 +1145,7 @@ void question::random()
         }
     } else if (level == 2)
     {
-        //Pick 2 random integers less than 100
+        //Pick 2 random integers between 2 and 12.
         while (num1 == 0)
         {
             a = Random.RandInt()/200;
