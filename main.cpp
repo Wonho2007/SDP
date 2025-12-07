@@ -7,10 +7,10 @@
 #include "FEHSound.h"
 
 void MainMenu(int *);
-void StartGame(int, int *, int *, FEHSound);
+void StartGame(int, int *, int *, FEHSound, int *);
 void SwitchScreen(int, int *, FEHSound);
-void MoveLeft(int *);
-void MoveRight(int *);
+void MoveLeft(int *, int *);
+void MoveRight(int *, int *);
 void endScreen(int *, int *);
 void cheat(int *, FEHSound);
 
@@ -36,21 +36,23 @@ public:
 };
 
 //Function to move car left
-void MoveLeft(int *xptr){
-    int carx=*xptr, lane1x=30, lane2x=70, lane3x=110, cary=160;
+void MoveLeft(int *xptr, int *cptr){
+    int carx=*xptr, cary=160;
     FEHImage car("car.png");
 
     if (carx>=70){
         LCD.SetFontColor(BLACK);
         LCD.FillRectangle(carx, cary, 25, 45); // Draw over old car
+        LCD.SetFontColor(0xb1ffb0);
         LCD.FillRectangle(170, 202, 115, 38);
         LCD.Update();
         carx-=40;
         *xptr-=40;
+        *cptr-=40;
         car.Draw(carx, cary);
         LCD.Update();
     } else {
-        LCD.SetFontColor(WHITE);
+        LCD.SetFontColor(0x011f00);
         LCD.SetFontScale(0.75);
         LCD.WriteAt("Already in", 180, 202);
         LCD.WriteAt("left lane!", 180, 217);
@@ -59,21 +61,23 @@ void MoveLeft(int *xptr){
 }
 
 //Function to move car right
-void MoveRight(int *xptr){
+void MoveRight(int *xptr, int *cptr){
     int carx=*xptr, cary=160;
     FEHImage car("car.png");
 
     if (carx<=70){
         LCD.SetFontColor(BLACK);
         LCD.FillRectangle(carx, cary, 25, 45); // Draw over old car
+        LCD.SetFontColor(0xb1ffb0);
         LCD.FillRectangle(170, 202, 115, 38);
         LCD.Update();
         carx+=40;
         *xptr+=40;
+        *cptr+=40;
         car.Draw(carx, cary);
         LCD.Update();
     } else {
-        LCD.SetFontColor(WHITE);
+        LCD.SetFontColor(0x011f00);
         LCD.SetFontScale(0.75);
         LCD.WriteAt("Already in", 180, 202);
         LCD.WriteAt("right lane!", 179, 217);
@@ -82,8 +86,8 @@ void MoveRight(int *xptr){
 
 //Function to show endscreen
 void endScreen(int *score, int *qptr){
-    LCD.SetBackgroundColor(BLACK);
-    LCD.SetFontColor(WHITE);
+    LCD.SetBackgroundColor(0xb1ffb0);
+    LCD.SetFontColor(0x011f00);
     LCD.Clear();
     LCD.SetFontScale(1); 
     LCD.WriteAt("YOU CRASHED!", 85, 180); 
@@ -116,7 +120,11 @@ void cheat(int *qptr, FEHSound music){
     LCD.SetBackgroundColor(BLACK);
     LCD.Clear();
     LCD.SetFontScale(1.5); 
+    LCD.SetFontColor(RED);
     LCD.WriteAt("CHEATER!", 83, 170); 
+    FEHImage flame ("flame.png");
+    flame.Draw(30, 70);
+    flame.Draw(180, 70);
     FEHImage mad1 ("mad1.png");
     mad1.Draw(100, 7);
     Sleep(1.0);
@@ -134,10 +142,10 @@ void cheat(int *qptr, FEHSound music){
 
 
 //Function to start game
-void StartGame(int level, int *qptr, int *tptr, FEHSound music)
+void StartGame(int level, int *qptr, int *tptr, FEHSound music, int *cptr)
 {
     //Clear screen
-    LCD.SetBackgroundColor(BLACK);
+    LCD.SetBackgroundColor(0xb1ffb0);
     LCD.Clear();
 
     if (level == 1)
@@ -148,23 +156,34 @@ void StartGame(int level, int *qptr, int *tptr, FEHSound music)
         bool keepTrackingClicks = true, game = true;
 
         // Draw Main Menu button
-        LCD.SetFontColor(RED);
+        LCD.SetFontColor(GRAY);
         LCD.DrawRectangle(x1, y1, width, height);
         LCD.WriteAt("Main Menu", x1+5, y1+5);
         LCD.Update();
 
         //Draw arrow buttons
         int rectX=175, rectY=170, rectW=105, rectH=30, lineX=227;
-        LCD.SetFontColor(WHITE);
+        LCD.SetFontColor(0x011f00);
         LCD.DrawRectangle(rectX, rectY, rectW, rectH);
         LCD.DrawLine(lineX, 170, lineX, 199);
         LCD.WriteAt("<--", 178, 175);
         LCD.WriteAt("-->", 238, 175);
         LCD.Update();
+
+        //Draw road lines
+        LCD.SetFontColor(BLACK);
+        LCD.FillRectangle(1, 0, 160, 240);
+        LCD.SetFontColor(WHITE);
+        LCD.DrawLine(160, 0, 160, 240);
+        LCD.DrawLine(20, 0, 20, 240);
+        LCD.DrawLine(1, 0, 1, 240);
+        LCD.DrawLine(140, 0, 140, 240);
+        LCD.DrawLine(60, 0, 60, 240);
+        LCD.DrawLine(100, 0, 100, 240);
        
         //Import car image and draw
         FEHImage car("car.png");
-        int carx=70, cary=160, *xptr=&carx;
+        int carx=*cptr, cary=160, *xptr=&carx;
         car.Draw(carx, cary);
         LCD.Update();
 
@@ -174,15 +193,6 @@ void StartGame(int level, int *qptr, int *tptr, FEHSound music)
         FEHImage g3 ("grass3.png");
         g3.Draw(1, 0);
         g1.Draw(140, 0);
-
-
-        //Draw road lines
-        LCD.DrawLine(160, 0, 160, 240);
-        LCD.DrawLine(20, 0, 20, 240);
-        LCD.DrawLine(1, 0, 1, 240);
-        LCD.DrawLine(140, 0, 140, 240);
-        LCD.DrawLine(60, 0, 60, 240);
-        LCD.DrawLine(100, 0, 100, 240);
 
         question levelOne(1);
         //Generate a random question
@@ -202,7 +212,7 @@ void StartGame(int level, int *qptr, int *tptr, FEHSound music)
                     if ((*tptr)>(*qptr)){
                         (*qptr)=(*tptr);
                     }
-                    StartGame(1, qptr, tptr, music);
+                    StartGame(1, qptr, tptr, music, cptr);
 
                 } else if (gameState == 0)
                 {
@@ -215,7 +225,6 @@ void StartGame(int level, int *qptr, int *tptr, FEHSound music)
 
                     LCD.SetFontColor(BLACK);
                     LCD.FillRectangle(carx, cary, 25, 45); // Draw over old car
-                    LCD.FillRectangle(170, 202, 115, 38);
                     
                     explosion.Draw(carx-15, cary);
                     LCD.Update();
@@ -246,17 +255,18 @@ void StartGame(int level, int *qptr, int *tptr, FEHSound music)
 
             if (touchx < x1+width && touchx > x1 && touchy > y1 && touchy < y1+height)
             {
+                music.pause();
                 MainMenu(qptr);
                 keepTrackingClicks = false;
             } else if (touchx < rectX+(rectW/2) && touchx > rectX && touchy > rectY && touchy < rectY+rectH){
                 //Move car left
-                MoveLeft(xptr);
+                MoveLeft(xptr, cptr);
                
 
 
             } else if (touchx < rectX+rectW && touchx > rectX+(rectW/2) && touchy > rectY && touchy < rectY+rectH){
                 //Move car right
-                MoveRight(xptr);
+                MoveRight(xptr, cptr);
             }
         }
     } else if (level == 2)
@@ -267,23 +277,34 @@ void StartGame(int level, int *qptr, int *tptr, FEHSound music)
         bool keepTrackingClicks = true, game = true;
 
         // Draw Main Menu button
-        LCD.SetFontColor(RED);
+        LCD.SetFontColor(GRAY);
         LCD.DrawRectangle(x1, y1, width, height);
         LCD.WriteAt("Main Menu", x1+5, y1+5);
         LCD.Update();
 
         //Draw arrow buttons
         int rectX=175, rectY=170, rectW=105, rectH=30, lineX=227;
-        LCD.SetFontColor(WHITE);
+        LCD.SetFontColor(0x011f00);
         LCD.DrawRectangle(rectX, rectY, rectW, rectH);
         LCD.DrawLine(lineX, 170, lineX, 199);
         LCD.WriteAt("<--", 178, 175);
         LCD.WriteAt("-->", 238, 175);
         LCD.Update();
+
+        //Draw road lines
+        LCD.SetFontColor(BLACK);
+        LCD.FillRectangle(1, 0, 160, 240);
+        LCD.SetFontColor(WHITE);
+        LCD.DrawLine(160, 0, 160, 240);
+        LCD.DrawLine(20, 0, 20, 240);
+        LCD.DrawLine(1, 0, 1, 240);
+        LCD.DrawLine(140, 0, 140, 240);
+        LCD.DrawLine(60, 0, 60, 240);
+        LCD.DrawLine(100, 0, 100, 240);
        
         //Import car image and draw
         FEHImage car("car.png");
-        int carx=70, cary=160, *xptr=&carx;
+        int carx=*cptr, cary=160, *xptr=&carx;
         car.Draw(carx, cary);
         LCD.Update();
 
@@ -293,15 +314,6 @@ void StartGame(int level, int *qptr, int *tptr, FEHSound music)
         FEHImage g3 ("grass3.png");
         g3.Draw(1, 0);
         g1.Draw(140, 0);
-
-
-        //Draw road lines
-        LCD.DrawLine(160, 0, 160, 240);
-        LCD.DrawLine(20, 0, 20, 240);
-        LCD.DrawLine(1, 0, 1, 240);
-        LCD.DrawLine(140, 0, 140, 240);
-        LCD.DrawLine(60, 0, 60, 240);
-        LCD.DrawLine(100, 0, 100, 240);
 
         question levelTwo(2);
         //Generate a random question
@@ -321,7 +333,7 @@ void StartGame(int level, int *qptr, int *tptr, FEHSound music)
                     if ((*tptr)>(*qptr)){
                         (*qptr)=(*tptr);
                     }
-                    StartGame(2, qptr, tptr, music);
+                    StartGame(2, qptr, tptr, music, cptr);
 
                 } else if (gameState == 0)
                 {
@@ -334,7 +346,6 @@ void StartGame(int level, int *qptr, int *tptr, FEHSound music)
 
                     LCD.SetFontColor(BLACK);
                     LCD.FillRectangle(carx, cary, 25, 45); // Draw over old car
-                    LCD.FillRectangle(170, 202, 115, 38);
 
                     explosion.Draw(carx-15, cary);
                     LCD.Update();
@@ -365,17 +376,18 @@ void StartGame(int level, int *qptr, int *tptr, FEHSound music)
 
             if (touchx < x1+width && touchx > x1 && touchy > y1 && touchy < y1+height)
             {
+                music.pause();
                 MainMenu(qptr);
                 keepTrackingClicks = false;
             } else if (touchx < rectX+(rectW/2) && touchx > rectX && touchy > rectY && touchy < rectY+rectH){
                 //Move car left
-                MoveLeft(xptr);
+                MoveLeft(xptr, cptr);
                
 
 
             } else if (touchx < rectX+rectW && touchx > rectX+(rectW/2) && touchy > rectY && touchy < rectY+rectH){
                 //Move car right
-                MoveRight(xptr);
+                MoveRight(xptr, cptr);
             }
         }
     } else if (level ==3)
@@ -385,23 +397,34 @@ void StartGame(int level, int *qptr, int *tptr, FEHSound music)
         bool keepTrackingClicks = true, game = true;
 
         // Draw Main Menu button
-        LCD.SetFontColor(RED);
+        LCD.SetFontColor(GRAY);
         LCD.DrawRectangle(x1, y1, width, height);
         LCD.WriteAt("Main Menu", x1+5, y1+5);
         LCD.Update();
 
         //Draw arrow buttons
         int rectX=175, rectY=170, rectW=105, rectH=30, lineX=227;
-        LCD.SetFontColor(WHITE);
+        LCD.SetFontColor(0x011f00);
         LCD.DrawRectangle(rectX, rectY, rectW, rectH);
         LCD.DrawLine(lineX, 170, lineX, 199);
         LCD.WriteAt("<--", 178, 175);
         LCD.WriteAt("-->", 238, 175);
         LCD.Update();
+
+        //Draw road lines
+        LCD.SetFontColor(BLACK);
+        LCD.FillRectangle(1, 0, 160, 240);
+        LCD.SetFontColor(WHITE);
+        LCD.DrawLine(160, 0, 160, 240);
+        LCD.DrawLine(20, 0, 20, 240);
+        LCD.DrawLine(1, 0, 1, 240);
+        LCD.DrawLine(140, 0, 140, 240);
+        LCD.DrawLine(60, 0, 60, 240);
+        LCD.DrawLine(100, 0, 100, 240);
        
         //Import car image and draw
         FEHImage car("car.png");
-        int carx=70, cary=160, *xptr=&carx;
+        int carx=*cptr, cary=160, *xptr=&carx;
         car.Draw(carx, cary);
         LCD.Update();
 
@@ -411,15 +434,6 @@ void StartGame(int level, int *qptr, int *tptr, FEHSound music)
         FEHImage g3 ("grass3.png");
         g3.Draw(1, 0);
         g1.Draw(140, 0);
-
-
-        //Draw road lines
-        LCD.DrawLine(160, 0, 160, 240);
-        LCD.DrawLine(20, 0, 20, 240);
-        LCD.DrawLine(1, 0, 1, 240);
-        LCD.DrawLine(140, 0, 140, 240);
-        LCD.DrawLine(60, 0, 60, 240);
-        LCD.DrawLine(100, 0, 100, 240);
 
         question levelThree(3);
         //Generate a random question
@@ -439,7 +453,7 @@ void StartGame(int level, int *qptr, int *tptr, FEHSound music)
                     if ((*tptr)>(*qptr)){
                         (*qptr)=(*tptr);
                     }
-                    StartGame(3, qptr, tptr, music);
+                    StartGame(3, qptr, tptr, music, cptr);
 
                 } else if (gameState == 0)
                 {
@@ -452,7 +466,6 @@ void StartGame(int level, int *qptr, int *tptr, FEHSound music)
 
                     LCD.SetFontColor(BLACK);
                     LCD.FillRectangle(carx, cary, 25, 45); // Draw over old car
-                    LCD.FillRectangle(170, 202, 115, 38);
 
                     explosion.Draw(carx-15, cary);
                     LCD.Update();
@@ -483,17 +496,18 @@ void StartGame(int level, int *qptr, int *tptr, FEHSound music)
 
             if (touchx < x1+width && touchx > x1 && touchy > y1 && touchy < y1+height)
             {
+                music.pause();
                 MainMenu(qptr);
                 keepTrackingClicks = false;
             } else if (touchx < rectX+(rectW/2) && touchx > rectX && touchy > rectY && touchy < rectY+rectH){
                 //Move car left
-                MoveLeft(xptr);
+                MoveLeft(xptr, cptr);
                
 
 
             } else if (touchx < rectX+rectW && touchx > rectX+(rectW/2) && touchy > rectY && touchy < rectY+rectH){
                 //Move car right
-                MoveRight(xptr);
+                MoveRight(xptr, cptr);
             }
         }
     }
@@ -507,16 +521,18 @@ void SwitchScreen(int screen, int *qptr, FEHSound sound)
     bool keepTrackingClicks = true;
     int tempScore=0, *tptr;
     tptr=&tempScore;
+    int carL=70, *cptr;
+    cptr=&carL;
 
 
     if (screen == 1)
     {
         //Clear screen
-        LCD.SetBackgroundColor(BLACK);
+        LCD.SetBackgroundColor(0xb1ffb0);
         LCD.Clear();
 
         // Draw Main Menu button
-        LCD.SetFontColor(RED);
+        LCD.SetFontColor(GRAY);
         LCD.DrawRectangle(x1, y1, width, height);
         LCD.WriteAt("Main Menu", x1+5, y1+5);
         LCD.Update();
@@ -528,7 +544,7 @@ void SwitchScreen(int screen, int *qptr, FEHSound sound)
         int levelButtony3 = levelButtony2+40;
 
         LCD.SetFontScale(1);
-        LCD.SetFontColor(RED);
+        LCD.SetFontColor(DARKGREEN);
         LCD.DrawRectangle(levelButtonx, levelButtony, levelButtonWidth, levelButtonHeight);
         LCD.WriteAt("LEVEL 1", levelButtonx+5, levelButtony+5);
 
@@ -557,21 +573,21 @@ void SwitchScreen(int screen, int *qptr, FEHSound sound)
                 sound.pause();
                 FEHSound coconutMall("coconutMall.wav");
                 coconutMall.restart();
-                StartGame(1, qptr, tptr, coconutMall);
+                StartGame(1, qptr, tptr, coconutMall, cptr);
                 keepTrackingClicks = false;
             } else if (touchx < levelButtonx+levelButtonWidth && touchx > levelButtonx && touchy > levelButtony2 && touchy < levelButtony2+levelButtonHeight)
             {
                 sound.pause();
                 FEHSound coconutMall("coconutMall.wav");
                 coconutMall.restart();
-                StartGame(2, qptr, tptr, coconutMall);
+                StartGame(2, qptr, tptr, coconutMall, cptr);
                 keepTrackingClicks = false;
             } else if (touchx < levelButtonx+levelButtonWidth && touchx > levelButtonx && touchy > levelButtony3 && touchy < levelButtony3+levelButtonHeight)
             {
                 sound.pause();
                 FEHSound coconutMall("coconutMall.wav");
                 coconutMall.restart();
-                StartGame(3, qptr, tptr, coconutMall);
+                StartGame(3, qptr, tptr, coconutMall, cptr);
                 keepTrackingClicks = false;
             }
         }
@@ -581,15 +597,16 @@ void SwitchScreen(int screen, int *qptr, FEHSound sound)
     } else if (screen ==2)
     {
         // Clear background
-        LCD.SetBackgroundColor(BLACK);
+        LCD.SetBackgroundColor(0xb1ffb0);
         LCD.Clear();
 
         //Write statistics
+        LCD.SetFontColor(DARKGREEN);
         LCD.WriteAt("High Score:", 95, 100);
         LCD.WriteAt((*qptr), 150, 125);
 
         // Draw Main Menu button
-        LCD.SetFontColor(RED);
+        LCD.SetFontColor(GRAY);
         LCD.DrawRectangle(x1, y1, width, height);
         LCD.WriteAt("Main Menu", x1+5, y1+5);
         LCD.Update();
@@ -603,6 +620,7 @@ void SwitchScreen(int screen, int *qptr, FEHSound sound)
 
             if (touchx < x1+width && touchx > x1 && touchy > y1 && touchy < y1+height)
             {
+                sound.pause();
                 MainMenu(qptr);
                 keepTrackingClicks = false;
             }
@@ -611,16 +629,17 @@ void SwitchScreen(int screen, int *qptr, FEHSound sound)
     } else if (screen ==3)
     {
         // Clear background
-        LCD.SetBackgroundColor(BLACK);
+        LCD.SetBackgroundColor(0xb1ffb0);
         LCD.Clear();
 
         // Draw Main Menu button
-        LCD.SetFontColor(RED);
+        LCD.SetFontColor(GRAY);
         LCD.DrawRectangle(x1, y1, width, height);
         LCD.WriteAt("Main Menu", x1+5, y1+5);
         LCD.Update();
 
         //Write statistics
+        LCD.SetFontColor(DARKGREEN);
         LCD.SetFontScale(0.5);
         LCD.WriteAt("Instructions:", 120, 60);
         LCD.WriteAt("When a question appears", 90, 90);
@@ -629,7 +648,6 @@ void SwitchScreen(int screen, int *qptr, FEHSound sound)
         LCD.WriteAt("with the correct answer!", 85, 180);
         LCD.WriteAt("Don't hold the arrows!", 90, 210);
 
-       
 
         //Check if player clicks main menu button
         while (keepTrackingClicks)
@@ -640,6 +658,7 @@ void SwitchScreen(int screen, int *qptr, FEHSound sound)
 
             if (touchx < x1+width && touchx > x1 && touchy > y1 && touchy < y1+height)
             {
+                sound.pause();
                 MainMenu(qptr);
                 keepTrackingClicks = false;
             }
@@ -648,22 +667,22 @@ void SwitchScreen(int screen, int *qptr, FEHSound sound)
     } else if (screen ==4)
     {
         // Clear background
-        LCD.SetBackgroundColor(BLACK);
+        LCD.SetBackgroundColor(0xb1ffb0);
         LCD.Clear();
 
         // Draw Main Menu button
-        LCD.SetFontColor(RED);
+        LCD.SetFontColor(GRAY);
         LCD.DrawRectangle(x1, y1, width, height);
         LCD.WriteAt("Main Menu", x1+5, y1+5);
         LCD.Update();
 
         //Write credits
+        LCD.SetFontColor(DARKGREEN);
         LCD.SetFontScale(1);
         LCD.WriteAt("Creators:", 106, 60);
         LCD.WriteAt("Wonho Lee", 110, 90);
         LCD.WriteAt("Ashlea Budzinski", 60, 120);
 
-       
 
         //Check if player clicks main menu button
         while (keepTrackingClicks)
@@ -674,6 +693,7 @@ void SwitchScreen(int screen, int *qptr, FEHSound sound)
 
             if (touchx < x1+width && touchx > x1 && touchy > y1 && touchy < y1+height)
             {
+                sound.pause();
                 MainMenu(qptr);
                 keepTrackingClicks = false;
             }
@@ -699,49 +719,55 @@ void MainMenu(int *qptr) {
     FEHSound mainMenuMusic("mainMenuMusic.wav");
     mainMenuMusic.restart();
 
+
     //Clear screen
-    LCD.SetBackgroundColor(BLACK);
+    LCD.SetBackgroundColor(0xb1ffb0);
     LCD.Clear();
 
 
     //Write title of game
     LCD.SetFontScale(1.5);
-    LCD.SetFontColor(WHITE);
-    LCD.WriteAt("GAME", 123, 10);
+    LCD.SetFontColor(DARKGREEN);
+    LCD.WriteAt("MATH", 123, 10);
     LCD.Update();
-    Sleep(0.4);
 
     LCD.SetFontScale(1.5);
-    LCD.SetFontColor(WHITE);
-    LCD.WriteAt("NAME", 123, 45);
+    LCD.SetFontColor(DARKGREEN);
+    LCD.WriteAt("RACER", 115, 45);
     LCD.Update();
+
+    //Draw flags
+    FEHImage flagL ("flagL.png");
+    flagL.Draw(20, 20);
+    FEHImage flagR ("flagR.png");
+    flagR.Draw(240, 20);
 
     Sleep(0.8);
 
     // Draw Play button
     LCD.SetFontScale(1);
-    LCD.SetFontColor(RED);
+    LCD.SetFontColor(GRAY);
     LCD.DrawRectangle(x1, y1, width, height);
     LCD.WriteAt("PLAY", x1+5, y1+5);
     Sleep(0.2);
     LCD.Update();
 
     // Draw Statistics button
-    LCD.SetFontColor(RED);
+    LCD.SetFontColor(GRAY);
     LCD.DrawRectangle(x2, y2, width2, height2);
     LCD.WriteAt("VIEW STATISTICS", x2+5, y2+5);
     Sleep(0.2);
     LCD.Update();
 
     // Draw Instructions button
-    LCD.SetFontColor(RED);
+    LCD.SetFontColor(GRAY);
     LCD.DrawRectangle(x3, y3, width3, height3);
     LCD.WriteAt("INSTRUCTIONS", x3+12, y3+5);
     Sleep(0.2);
     LCD.Update();
 
     // Draw Credits button
-    LCD.SetFontColor(RED);
+    LCD.SetFontColor(GRAY);
     LCD.DrawRectangle(x4, y4, width4, height4);
     LCD.WriteAt("CREDITS", x4+7, y4+5);
     Sleep(0.2);
@@ -763,17 +789,14 @@ void MainMenu(int *qptr) {
             keepTrackingClicks = false;
         } else if (touchx < x2+width2 && touchx > x2 && touchy > y2 && touchy < y2+height2)
         {
-            mainMenuMusic.pause();
             SwitchScreen(2, qptr, mainMenuMusic);
             keepTrackingClicks = false;
         } else if (touchx < x3+width3 && touchx > x3 && touchy > y3 && touchy < y3+height3)
         {
-            mainMenuMusic.pause();
             SwitchScreen(3, qptr, mainMenuMusic);
             keepTrackingClicks = false;
         } else if (touchx < x4+width4 && touchx > x4 && touchy > y4 && touchy < y4+height4)
         {
-            mainMenuMusic.pause();
             SwitchScreen(4, qptr, mainMenuMusic);
             keepTrackingClicks = false;
         }
@@ -931,6 +954,7 @@ void question::random()
             addSub = '+';
             //Write question
             LCD.SetFontScale(1);
+            LCD.SetFontColor(0x011f00);
             LCD.WriteAt(num1, 190, 90);
             LCD.WriteAt(addSub, 220, 90);
             LCD.WriteAt(num2, 240, 90);
@@ -944,6 +968,7 @@ void question::random()
             answer = num1 - num2;
             //Write question
             LCD.SetFontScale(1);
+            LCD.SetFontColor(0x011f00);
             LCD.WriteAt(num1, 190, 90);
             LCD.WriteAt(addSub, 220, 90);
             LCD.WriteAt(num2, 240, 90);
@@ -954,6 +979,7 @@ void question::random()
                 answer = num2 - num1;
                 //Write question
                 LCD.SetFontScale(1);
+                LCD.SetFontColor(0x011f00);
                 LCD.WriteAt(num2, 190, 90);
                 LCD.WriteAt(addSub, 220, 90);
                 LCD.WriteAt(num1, 240, 90);
@@ -963,6 +989,7 @@ void question::random()
 
         //Pick random 1-3 gate that the answer falls through.
         LCD.SetFontScale(0.8);
+        LCD.SetFontColor(WHITE);
         int rectW = 40, rectY = 0;
         while (decoy2 == 0)
         {
@@ -1111,6 +1138,7 @@ void question::random()
 
         //Write question
         LCD.SetFontScale(1);
+        LCD.SetFontColor(0x011f00);
         LCD.WriteAt(num1, 190, 90);
         LCD.WriteAt('X',220, 90);
         LCD.WriteAt(num2, 240, 90);
@@ -1118,6 +1146,7 @@ void question::random()
    
         //Pick random 1-3 gate that the answer falls through.
         LCD.SetFontScale(0.8);
+        LCD.SetFontColor(WHITE);
         int rectW = 40, rectY=0;
         while (decoy2 == 0)
         {
@@ -1280,6 +1309,7 @@ void question::random()
 
         //Write question
         LCD.SetFontScale(1);
+        LCD.SetFontColor(0x011f00);
         LCD.WriteAt(num1, 180, 90);
         LCD.WriteAt('X', 210, 90);
         LCD.WriteAt(num2, 230, 90);
@@ -1290,6 +1320,7 @@ void question::random()
 
         //Pick random 1-3 gate that the answer falls through.
         LCD.SetFontScale(0.8);
+        LCD.SetFontColor(WHITE);
         int rectW=40, rectY=0;
         while (decoy2 == 0)
         {
