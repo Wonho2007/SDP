@@ -1,26 +1,82 @@
 //320 x 240
 //lane1x=30, lane2x=70, lane3x=110
+
+//Created by Wonho Lee and Ashlea Budzinski
+//This project was created with help from the documentation of syntax provided by https://u.osu.edu/sdpsimulator/programming-syntax/
+
 #include "FEHLCD.h"
 #include "FEHUtility.h"
 #include "FEHRandom.h"
 #include "FEHImages.h"
 #include "FEHSound.h"
 
+/*  MainMenu function:
+    Primary Author: Wonho Lee
+    This function draws the main menu. It writes the title and draws the play, stats, instructions, and credit buttons.
+    Its return type is void.
+    Its input is a pointer to the user's score.
+*/
 void MainMenu(int *);
+
+/*  StartGame function:
+    Authors: Wonho Lee, Ashlea Budzinski
+    This function starts the game. It will make an object and call a function from the class "question" to generate random questions.
+    Its return type is void.
+    Its input is the level, a pointer to the user's score, a pointer to the user's top score, and an object of the FEHSound class.
+*/
 void StartGame(int, int *, int *, FEHSound);
+
+/*  SwitchScreen function:
+    Primary Author: Wonho Lee
+    This function switches the screen based on what button the user clicks on the main menu.
+    Its return type is void.
+    Its input is the screen to switch to, a pointer to the user's score, and an object of the FEHSound class.
+*/
 void SwitchScreen(int, int *, FEHSound);
+
+/*  MoveLeft function:
+    Primary Author: Ashlea Budzinski
+    This function moves the car to the left when the user clicks the left arrow, unless the car is in the leftmost lane.
+    Its return type is void.
+    Its input is a pointer to the car's x position.
+*/
 void MoveLeft(int *);
+
+/*  MoveRight function:
+    Primary Author: Ashlea Budzinski
+    This function moves the car to the right when the user clicks the right arrow, unless the car is in the rightmost lane.
+    Its return type is void.
+    Its input is a pointer to the car's x position.
+*/
 void MoveRight(int *);
+
+/*  endScreen function:
+    Primary Author: Ashlea Budzinski
+    This function displays an endscreen when the user selects the wrong answer.
+    Its return type is void.
+    Its input is a pointer to the user's score and top score.
+*/
 void endScreen(int *, int *);
+
+/*  cheat function:
+    Primary Author: Ashlea Budzinski
+    This function displays a screen when the user holds an arrow button for too long.
+    Its return type is void.
+    Its input is a pointer to the user's top score and an object of the FEHSound class.
+*/
 void cheat(int *, FEHSound);
 
+/*  question class:
+    Primary Author: Wonho Lee
+    This class stores the level, decoy answers, correct answer, x coordinate of all options, and the y coordinate of the correct option.
+    It also contains a constructor and two functions.
+*/
 class question
 {
 public:
     int level;
     int decoy1;
     int decoy2;
-    int response;
     int answer;
     int correctX;
 
@@ -30,8 +86,26 @@ public:
     int answerY;
 
 
-    question(int = 1, int = 0, int = 0, int = 0, int = 0, int = 0, int = 0, int = 0, int=0);
+    question(int = 1, int = 0, int = 0, int = 0, int = 0, int = 0, int = 0, int=0);
+
+
+    /*  question::random function:
+    Primary Author: Wonho Lee
+    This function generates a random math question, based on the level selected. It will generate 2 random answers alongside the correct answer.
+    It will also pick a random lane for the correct answer to fall into. It will then place the decoy answers in the remaining lanes.
+    Its return type is void.
+    It has no inputs.
+    */
     void random();
+
+
+    /*  question::moveAnswers function:
+    Primary Author: Wonho Lee
+    This function will animate the answers. It will move all the answer options downwards, towards the car. It checks 
+    Its return type is an integer, and it returns the current gamestate. If it returns 2, it means the user selected the correct option.
+    If it returns 1, it means the options are still above the player. If it returns 0, the user selected the wrong option.
+    Its input is a pointer to the car's x coordinate.
+    */
     int moveAnswers(int *);
 };
 
@@ -184,6 +258,11 @@ void StartGame(int level, int *qptr, int *tptr, FEHSound music)
         LCD.DrawLine(60, 0, 60, 240);
         LCD.DrawLine(100, 0, 100, 240);
 
+        /*  levelOne object of class question:
+        Primary Author: Wonho Lee
+        This creates an object that can be used to create questions and move answers for level one.
+        It stores 1 into the level member of the object.
+        */
         question levelOne(1);
         //Generate a random question
         levelOne.random();
@@ -303,6 +382,11 @@ void StartGame(int level, int *qptr, int *tptr, FEHSound music)
         LCD.DrawLine(60, 0, 60, 240);
         LCD.DrawLine(100, 0, 100, 240);
 
+        /*  levelTwo object of class question:
+        Primary Author: Ashlea Budzinski
+        This creates an object that can be used to create questions and move answers for level two.
+        It stores 2 into the level member of the object.
+        */
         question levelTwo(2);
         //Generate a random question
         levelTwo.random();
@@ -421,6 +505,11 @@ void StartGame(int level, int *qptr, int *tptr, FEHSound music)
         LCD.DrawLine(60, 0, 60, 240);
         LCD.DrawLine(100, 0, 100, 240);
 
+        /*  levelThree object of class question:
+        Primary Author: Ashlea Budzinski
+        This creates an object that can be used to create questions and move answers for level three.
+        It stores 3 into the level member of the object.
+        */
         question levelThree(3);
         //Generate a random question
         levelThree.random();
@@ -799,20 +888,19 @@ int main() {
 }
 
 //Constructor for question function 
-question::question(int l, int a, int b, int x, int y, int z, int c, int d, int e)
+question::question(int l, int a, int b, int c, int d, int e, int f, int g)
 {
 
     level = l;
     decoy1 = a;
     decoy2 = b;
-    response = x;
-    answer = y;
-    correctX = z;
+    answer = c;
+    correctX = d;
 
-    decoy1X = c;
-    decoy2X = d;
+    decoy1X = e;
+    decoy2X = f;
 
-    answerY = e;
+    answerY = g;
 }
 
 //Function to move the answer options and check if player won
@@ -825,7 +913,7 @@ int question::moveAnswers(int *xptr)
     //See if the car is at the correct x position and y
     if (*xptr == correctX+10 && answerY >= 160-30)
     {
-        //You win 
+        //You are correct 
         return(2);
 
 
