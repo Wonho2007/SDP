@@ -38,7 +38,7 @@ void SwitchScreen(int, int *, FEHSound);
     Primary Author: Ashlea Budzinski
     This function moves the car to the left when the user clicks the left arrow, unless the car is in the leftmost lane.
     Its return type is void.
-    Its input is a pointer to the car's x position.
+    Its input is a pointer to the car's x position and a pointer to the car's old x position.
 */
 void MoveLeft(int *, int *);
 
@@ -46,7 +46,7 @@ void MoveLeft(int *, int *);
     Primary Author: Ashlea Budzinski
     This function moves the car to the right when the user clicks the right arrow, unless the car is in the rightmost lane.
     Its return type is void.
-    Its input is a pointer to the car's x position.
+    Its input is a pointer to the car's x position and a pointer to the car's old x position.
 */
 void MoveRight(int *, int *);
 
